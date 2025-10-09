@@ -1,94 +1,105 @@
-# 10x Astro Starter
+# 10xCards
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+A web application for rapid flashcard creation and learning, powered by AI and a simple spaced repetition system.
+
+## Table of Contents
+- [Project Description](#project-description)
+- [Tech Stack](#tech-stack)
+- [Getting Started Locally](#getting-started-locally)
+- [Available Scripts](#available-scripts)
+- [Project Scope](#project-scope)
+- [Project Status](#project-status)
+- [License](#license)
+
+## Project Description
+
+10xCards is designed to solve the problem of tedious and time-consuming manual flashcard creation. It allows users, particularly students, to quickly convert their notes into study material. By simply pasting a block of text, users can leverage AI to automatically generate a set of flashcards. These cards can then be reviewed, edited, and saved into private decks tied to a user account.
+
+The learning process is facilitated by a simple, yet effective, Leitner spaced repetition algorithm to help users efficiently memorize their material.
 
 ## Tech Stack
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+| Category              | Technology                                                              |
+| --------------------- | ----------------------------------------------------------------------- |
+| **Frontend**          | [Astro](https://astro.build/), [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/), [Shadcn/ui](https://ui.shadcn.com/) |
+| **Backend**           | [Supabase](https://supabase.com/) (PostgreSQL, Authentication, BaaS)      |
+| **AI Integration**    | [OpenRouter.ai](https://openrouter.ai/) (Access to various LLMs)        |
+| **CI/CD & Hosting**   | [GitHub Actions](https://github.com/features/actions), [DigitalOcean](https://www.digitalocean.com/) (Docker) |
 
-## Prerequisites
+## Getting Started Locally
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
+Follow these instructions to get the project running on your local machine for development and testing purposes.
 
-## Getting Started
+### Prerequisites
 
-1. Clone the repository:
+- **Node.js**: Version `22.14.0`. We recommend using a version manager like [nvm](https://github.com/nvm-sh/nvm).
+  ```sh
+  nvm use
+  ```
+- **Git**: You'll need Git to clone the repository.
 
-```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
-```
+### Installation
 
-2. Install dependencies:
+1.  **Clone the repository:**
+    ```sh
+    git clone https://github.com/your-username/10x-cards.git
+    cd 10x-cards
+    ```
 
-```bash
-npm install
-```
+2.  **Install dependencies:**
+    ```sh
+    npm install
+    ```
 
-3. Run the development server:
+3.  **Set up environment variables:**
+    Create a `.env` file in the root of the project by copying the example file.
+    ```sh
+    cp .env.example .env
+    ```
+    Then, fill in the required environment variables in the `.env` file (e.g., Supabase URL/keys and OpenRouter API key).
 
-```bash
-npm run dev
-```
-
-4. Build for production:
-
-```bash
-npm run build
-```
+4.  **Run the development server:**
+    ```sh
+    npm run dev
+    ```
+    The application will be available at `http://localhost:4321`.
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+The following scripts are available in the project:
 
-## Project Structure
+- `npm run dev`: Runs the app in development mode.
+- `npm run build`: Builds the app for production.
+- `npm run preview`: Serves the production build locally for preview.
+- `npm run lint`: Lints the codebase using ESLint.
+- `npm run lint:fix`: Lints the codebase and automatically fixes issues.
+- `npm run format`: Formats the code using Prettier.
 
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
+## Project Scope
 
-## AI Development Support
+### Key Features (MVP)
 
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
+- **AI-Powered Flashcard Generation**: Create flashcards automatically from pasted text (1,000-10,000 characters).
+- **Review & Edit Workflow**: Users can review, edit, or delete AI-generated flashcards before saving them to a deck.
+- **User Authentication**: Secure user accounts (email/password) to store and manage private flashcard decks.
+- **Manual Card Creation**: Ability to manually add individual flashcards to a deck.
+- **Spaced Repetition System**: A simple Leitner (5-box) system to facilitate learning.
+- **Deck Management**: Users can create, view, and delete their flashcard decks.
 
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
+### Out of Scope (for MVP)
 
-### Cursor IDE
+- Advanced or customizable spaced repetition algorithms.
+- Importing content from files (e.g., PDF, DOCX).
+- Sharing decks between users.
+- Native mobile applications (the project is web-only but responsive).
+- Password reset functionality and Single Sign-On (SSO).
 
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
+## Project Status
 
-### GitHub Copilot
+**Version:** 0.0.1
 
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
-
-### Windsurf
-
-The `.windsurfrules` file contains AI configuration for Windsurf.
-
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+The project is currently in the initial **MVP (Minimum Viable Product) development phase**. The core features are being built out as defined in the project scope.
 
 ## License
 
-MIT
+This project is currently not under any license.
