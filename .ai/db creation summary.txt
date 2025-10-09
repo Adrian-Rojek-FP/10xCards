@@ -1,0 +1,49 @@
+✦ <conversation_summary>
+  <decisions>
+   1. Tabela users będzie zarządzana przez Supabase Auth (auth.users).
+   2. Tabela cards będzie zawierać zdenormalizowaną kolumnę owner_id w celu uproszczenia i optymalizacji RLS.
+   3. Tabela decks będzie miała kolumnę name typu TEXT z ograniczeniem długości do 100 znaków.
+   4. Tabela cards będzie miała kolumnę source z typem ENUM zawierającym wartości: 'ai', 'manual', oraz 'ai-edited'.
+   5. Funkcjonalność śledzenia stanu nauki (system Leitnera) i dedykowana tabela study_progress zostają pominięte w MVP.
+   6. Zbieranie i przechowywanie danych telemetrycznych w bazie danych zostaje pominięte na tym etapie.
+   7. Zestawy (decks) nie będą usuwane fizycznie; zamiast tego będzie używany mechanizm "soft delete" za pomocą flagi is_deleted.
+   8. Indeksy w bazie danych zostaną utworzone wyłącznie na kolumnach będących kluczami obcymi.
+   9. Kolumny created_at i updated_at będą zarządzane automatycznie na poziomie bazy danych.
+   10. Zostaną zaimplementowane polityki bezpieczeństwa na poziomie wiersza (RLS), aby zapewnić prywatność danych i obsługiwać logikę "soft delete".
+  </decisions>
+
+  <matched_recommendations>
+   1. Wykorzystanie wbudowanej tabeli auth.users z Supabase jako głównego źródła danych o użytkownikach.
+   2. Zachowanie kolumny owner_id w tabeli cards w celu uproszczenia i zwiększenia wydajności polityk RLS.
+   3. Zastosowanie typu ENUM w PostgreSQL dla kolumny cards.source w celu zapewnienia integralności danych.
+   4. Implementacja "soft delete" dla tabeli decks poprzez dodanie flagi is_deleted.
+   5. Aktualizacja polityk RLS dla tabeli decks, aby filtrowały rekordy z flagą is_deleted = true.
+   6. Modyfikacja polityk RLS dla tabeli cards, aby uniemożliwić dostęp do fiszek należących do usuniętych zestawów oraz blokować dodawanie do nich nowych fiszek.
+   7. Automatyzacja zarządzania znacznikami czasu created_at i updated_at za pomocą domyślnych wartości i triggerów w bazie danych.
+   8. Utworzenie indeksów na wszystkich kolumnach kluczy obcych w celu zapewnienia wydajności zapytań.
+  </matched_recommendations>
+
+  <database_planning_summary>
+  Na podstawie dokumentu wymagań produktu (PRD) i stosu technologicznego uzgodniono architekturę bazy danych PostgreSQL dla MVP aplikacji 10xCards. Celem jest stworzenie prostego, ale bezpiecznego i wydajnego schematu, z pominięciem na tym
+  etapie funkcjonalności śledzenia postępów w nauce oraz telemetrii.
+
+  Kluczowe Encje i Relacje:
+   - users: Encja nie będzie tworzona manualnie; zamiast tego wykorzystana zostanie tabela auth.users dostarczana przez Supabase. Identyfikator użytkownika (id typu UUID) będzie kluczem do wszystkich jego zasobów.
+   - decks: Główna encja grupująca fiszki. Będzie zawierać id (PK), owner_id (FK do auth.users.id), name (TEXT, max 100 znaków), is_deleted (BOOLEAN, domyślnie false) oraz automatyczne znaczniki czasu created_at i updated_at.
+   - cards: Encja reprezentująca pojedynczą fiszkę. Będzie zawierać id (PK), deck_id (FK do decks.id), owner_id (zdenormalizowany FK do auth.users.id), front (TEXT), back (TEXT), source (ENUM 'ai', 'manual', 'ai-edited') oraz automatyczne
+     znaczniki czasu.
+
+  Relacje między encjami są następujące: użytkownik może mieć wiele zestawów (1-do-wielu), a zestaw może mieć wiele fiszek (1-do-wielu).
+
+  Bezpieczeństwo i Skalowalność:
+   - Bezpieczeństwo: Podstawowym mechanizmem bezpieczeństwa będzie Row-Level Security (RLS) w PostgreSQL, ściśle zintegrowane z systemem uwierzytelniania Supabase. Polityki RLS zapewnią, że użytkownicy mają dostęp (CRUD) wyłącznie do własnych
+     zasobów, co będzie weryfikowane przez porównanie owner_id zasobu z auth.uid() zalogowanego użytkownika. Polityki obsłużą również logikę biznesową, taką jak blokowanie dostępu do zasobów oznaczonych jako usunięte (is_deleted = true).
+   - Skalowalność: Dla potrzeb MVP, wydajność zostanie zapewniona przez utworzenie indeksów na wszystkich kolumnach kluczy obcych (owner_id, deck_id). Decyzja o denormalizacji owner_id w tabeli cards jest również podyktowana wydajnością,
+     ponieważ unika się kosztownych operacji JOIN w politykach RLS, które są wykonywane przy każdym zapytaniu.
+  </database_planning_summary>
+
+  <unresolved_issues>
+  Na podstawie przeprowadzonej dyskusji wszystkie kluczowe kwestie dotyczące planowania schematu bazy danych dla MVP zostały rozwiązane i uzgodnione. Nie ma nierozwiązanych problemów. Następnym krokiem, po zatwierdzeniu tego podsumowania,
+  będzie przygotowanie finalnego skryptu SQL.
+  </unresolved_issues>
+  </conversation_summary>
