@@ -49,12 +49,12 @@ export function FlashcardListItem({ flashcard, index, onAccept, onEdit, onReject
   return (
     <div
       className={cn(
-        "rounded-lg border bg-card p-6 shadow-sm transition-all",
+        "rounded-lg border bg-card p-6 shadow-sm transition-all flex flex-col h-full",
         flashcard.accepted && "border-green-500 bg-green-50 dark:bg-green-950/20",
         flashcard.edited && "border-blue-500"
       )}
     >
-      <div className="space-y-4">
+      <div className="space-y-4 flex-1">
         {/* Front of the card */}
         <div className="space-y-2">
           <label htmlFor={`front-${index}`} className="text-sm font-semibold text-muted-foreground">
@@ -147,32 +147,32 @@ export function FlashcardListItem({ flashcard, index, onAccept, onEdit, onReject
             </span>
           )}
         </div>
+      </div>
 
-        {/* Action buttons */}
-        <div className="flex gap-2 pt-2 flex-wrap">
-          {isEditing ? (
-            <>
-              <Button onClick={handleSaveEdit} disabled={!canSaveEdit} size="sm">
-                Zapisz
-              </Button>
-              <Button onClick={handleCancelEdit} variant="outline" size="sm">
-                Anuluj
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button onClick={handleAccept} variant={flashcard.accepted ? "secondary" : "default"} size="sm">
-                {flashcard.accepted ? "Zaakceptowana" : "Zatwierdź"}
-              </Button>
-              <Button onClick={handleStartEdit} variant="outline" size="sm">
-                Edytuj
-              </Button>
-              <Button onClick={handleReject} variant="destructive" size="sm">
-                Odrzuć
-              </Button>
-            </>
-          )}
-        </div>
+      {/* Action buttons */}
+      <div className="flex gap-2 pt-4 flex-wrap">
+        {isEditing ? (
+          <>
+            <Button onClick={handleSaveEdit} disabled={!canSaveEdit} size="sm">
+              Zapisz
+            </Button>
+            <Button onClick={handleCancelEdit} variant="outline" size="sm">
+              Anuluj
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={handleAccept} variant={flashcard.accepted ? "secondary" : "default"} size="sm">
+              {flashcard.accepted ? "Anuluj" : "Zatwierdź"}
+            </Button>
+            <Button onClick={handleStartEdit} variant="outline" size="sm">
+              Edytuj
+            </Button>
+            <Button onClick={handleReject} variant="destructive" size="sm">
+              Odrzuć
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );
