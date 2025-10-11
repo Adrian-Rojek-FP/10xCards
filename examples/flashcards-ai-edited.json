@@ -1,0 +1,17 @@
+{
+  "flashcards": [
+    {
+      "front": "What is JavaScript? 🚀",
+      "back": "JavaScript is a high-level, interpreted programming language that conforms to the ECMAScript specification. Key features include: dynamic typing, prototype-based OOP, and first-class functions.",
+      "source": "ai-edited",
+      "generation_id": 1
+    },
+    {
+      "front": "Name popular JavaScript frameworks",
+      "back": "React, Angular, Vue.js (for front-end), and Node.js (for server-side development).",
+      "source": "ai-edited",
+      "generation_id": 1
+    }
+  ]
+}
+

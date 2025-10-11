@@ -1,0 +1,23 @@
+{
+  "flashcards": [
+    {
+      "front": "What is JavaScript?",
+      "back": "A high-level, interpreted programming language that conforms to the ECMAScript specification.",
+      "source": "manual",
+      "generation_id": null
+    },
+    {
+      "front": "What are the core technologies of the web?",
+      "back": "HTML, CSS, and JavaScript",
+      "source": "manual",
+      "generation_id": null
+    },
+    {
+      "front": "Who invented JavaScript?",
+      "back": "Brendan Eich in 1995",
+      "source": "manual",
+      "generation_id": null
+    }
+  ]
+}
+

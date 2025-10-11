@@ -1,0 +1,23 @@
+{
+  "flashcards": [
+    {
+      "front": "What is JavaScript?",
+      "back": "A high-level, interpreted programming language that conforms to the ECMAScript specification. It has curly-bracket syntax, dynamic typing, prototype-based object-orientation, and first-class functions.",
+      "source": "ai-full",
+      "generation_id": 2
+    },
+    {
+      "front": "What are the core technologies of the World Wide Web?",
+      "back": "HTML, CSS, and JavaScript. JavaScript enables interactive web pages and is an essential part of web applications.",
+      "source": "ai-full",
+      "generation_id": 2
+    },
+    {
+      "front": "What programming paradigms does JavaScript support?",
+      "back": "JavaScript supports event-driven, functional, and imperative programming styles.",
+      "source": "ai-full",
+      "generation_id": 2
+    }
+  ]
+}
+

@@ -1,0 +1,23 @@
+{
+  "flashcards": [
+    {
+      "front": "What is JavaScript?",
+      "back": "A high-level, interpreted programming language that conforms to the ECMAScript specification.",
+      "source": "ai-full",
+      "generation_id": 1
+    },
+    {
+      "front": "What are the main JavaScript engines?",
+      "back": "V8 (Chrome, Node.js), SpiderMonkey (Firefox), JavaScriptCore (Safari)",
+      "source": "ai-edited",
+      "generation_id": 2
+    },
+    {
+      "front": "What is my favorite JavaScript framework?",
+      "back": "React - because of its component-based architecture and large ecosystem",
+      "source": "manual",
+      "generation_id": null
+    }
+  ]
+}
+

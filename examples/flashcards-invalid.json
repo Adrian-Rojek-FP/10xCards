@@ -1,0 +1,35 @@
+{
+  "flashcards": [
+    {
+      "front": "",
+      "back": "This will fail because front is empty",
+      "source": "manual",
+      "generation_id": null
+    },
+    {
+      "front": "This is a very long front side that exceeds the 200 character limit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud exercitation.",
+      "back": "Too long front side",
+      "source": "manual",
+      "generation_id": null
+    },
+    {
+      "front": "Missing generation_id for AI source",
+      "back": "This will fail because ai-full requires a generation_id",
+      "source": "ai-full",
+      "generation_id": null
+    },
+    {
+      "front": "Invalid source type",
+      "back": "This will fail because source is not valid",
+      "source": "ai-generated",
+      "generation_id": null
+    },
+    {
+      "front": "Manual with generation_id",
+      "back": "This will fail because manual source should have null generation_id",
+      "source": "manual",
+      "generation_id": 999
+    }
+  ]
+}
+

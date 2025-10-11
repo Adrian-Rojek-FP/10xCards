@@ -1,0 +1,11 @@
+{
+  "flashcards": [
+    {
+      "front": "What is JavaScript?",
+      "back": "A high-level, interpreted programming language that conforms to the ECMAScript specification.",
+      "source": "manual",
+      "generation_id": null
+    }
+  ]
+}
+
