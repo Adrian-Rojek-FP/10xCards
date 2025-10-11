@@ -100,6 +100,28 @@ async function aiServiceGenerateFlashcards(sourceText: string): Promise<Flashcar
 
     const response = await openRouter.sendChatMessage<AIResponse>(userMessage);
 
+    // Log response for debugging
+    console.log("AI Response:", JSON.stringify(response, null, 2));
+
+    // Validate response structure
+    if (!response) {
+      throw new Error("AI service returned no response");
+    }
+
+    if (!response.flashcards) {
+      throw new Error(`AI service returned invalid response structure. Response: ${JSON.stringify(response)}`);
+    }
+
+    if (!Array.isArray(response.flashcards)) {
+      throw new Error(
+        `AI service returned flashcards that is not an array. Type: ${typeof response.flashcards}, Value: ${JSON.stringify(response.flashcards)}`
+      );
+    }
+
+    if (response.flashcards.length === 0) {
+      throw new Error("AI service returned no flashcards");
+    }
+
     // Map response to FlashcardProposalDto format
     const flashcardProposals: FlashcardProposalDto[] = response.flashcards.map((card) => ({
       front: card.front,
