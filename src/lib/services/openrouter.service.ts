@@ -561,6 +561,44 @@ export class OpenRouterService {
   }
 
   /**
+   * Clean and fix common JSON issues in AI responses
+   *
+   * @param jsonString - Raw JSON string from AI
+   * @returns Cleaned JSON string
+   */
+  private cleanJsonString(jsonString: string): string {
+    let cleaned = jsonString.trim();
+
+    // Remove markdown code block delimiters if present
+    cleaned = cleaned
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/, "")
+      .replace(/```\s*$/, "");
+
+    // Remove any leading/trailing whitespace again after removing code blocks
+    cleaned = cleaned.trim();
+
+    // Try to fix common issues:
+    // 1. Remove trailing commas before closing braces/brackets
+    cleaned = cleaned.replace(/,(\s*[}\]])/g, "$1");
+
+    // 2. Remove comments (single-line and multi-line)
+    cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, "");
+    cleaned = cleaned.replace(/\/\/.*/g, "");
+
+    // 3. Replace single quotes with double quotes for property names and values
+    // This is tricky and might not work for all cases, but handles common patterns
+    // Note: This is a simplified approach and may need refinement
+    cleaned = cleaned.replace(/'([^']*)':/g, '"$1":');
+
+    // 4. Fix unquoted property names (e.g., {front: "value"} -> {"front": "value"})
+    // This regex looks for word characters followed by a colon that aren't already in quotes
+    cleaned = cleaned.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)(\s*:)/g, '$1"$2"$3');
+
+    return cleaned;
+  }
+
+  /**
    * Parse API response
    *
    * @param response - API response
@@ -581,11 +619,28 @@ export class OpenRouterService {
     // If response format is JSON, parse it
     if (this.currentResponseFormat) {
       try {
+        // First, try direct parsing
         return JSON.parse(message.content) as T;
-      } catch (error) {
-        throw new ValidationError(
-          `Failed to parse JSON response: ${error instanceof Error ? error.message : String(error)}`
-        );
+      } catch (firstError) {
+        // If direct parsing fails, try cleaning the JSON string
+        try {
+          const cleaned = this.cleanJsonString(message.content);
+          this.log("warn", "JSON parsing required cleaning", {
+            originalError: firstError instanceof Error ? firstError.message : String(firstError),
+          });
+          return JSON.parse(cleaned) as T;
+        } catch (secondError) {
+          // If cleaning also fails, log both errors and the original content
+          this.log("error", "Failed to parse JSON even after cleaning", {
+            firstError: firstError instanceof Error ? firstError.message : String(firstError),
+            secondError: secondError instanceof Error ? secondError.message : String(secondError),
+            contentPreview: message.content.substring(0, 500),
+          });
+
+          throw new ValidationError(
+            `Failed to parse JSON response: ${secondError instanceof Error ? secondError.message : String(secondError)}\n\nOriginal content preview: ${message.content.substring(0, 200)}...`
+          );
+        }
       }
     }
 
