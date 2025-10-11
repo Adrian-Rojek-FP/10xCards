@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { AppShell } from "@/components/AppShell";
 
 interface Props {
   title?: string;
@@ -16,9 +17,24 @@ const { title = "10x Astro Starter" } = Astro.props;
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <!-- prettier-ignore-start -->
+    <script is:inline>
+      (function () {
+        const e = "ui-theme";
+        const t = (typeof localStorage !== "undefined" && localStorage.getItem(e)) || "dark";
+        if (t === "light") {
+          document.documentElement.classList.remove("dark");
+        } else {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+    <!-- prettier-ignore-end -->
   </head>
   <body>
-    <slot />
+    <AppShell client:load>
+      <slot />
+    </AppShell>
   </body>
 </html>
 
