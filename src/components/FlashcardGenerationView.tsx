@@ -63,9 +63,22 @@ export default function FlashcardGenerationView() {
         <div className="space-y-4">
           <TextInputArea value={sourceText} onChange={setSourceText} disabled={isLoading} />
 
-          <Button onClick={handleGenerate} disabled={!canGenerate} size="lg" className="w-full sm:w-auto">
-            {isLoading ? "Generowanie..." : "Generuj fiszki"}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+            <Button onClick={handleGenerate} disabled={!canGenerate} size="lg" className="w-full sm:w-auto">
+              {isLoading ? "Generowanie..." : "Generuj fiszki"}
+            </Button>
+
+            {!isLoading && flashcards.length > 0 && (
+              <div className="sm:ml-auto w-full sm:w-auto">
+                <BulkSaveButton
+                  flashcards={flashcards}
+                  generationId={generationId}
+                  onSaveSuccess={handleSaveSuccess}
+                  onSaveError={handleSaveError}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {errorMessage && (
@@ -132,13 +145,6 @@ export default function FlashcardGenerationView() {
               onAccept={handleAccept}
               onEdit={handleEdit}
               onReject={handleReject}
-            />
-
-            <BulkSaveButton
-              flashcards={flashcards}
-              generationId={generationId}
-              onSaveSuccess={handleSaveSuccess}
-              onSaveError={handleSaveError}
             />
           </>
         )}

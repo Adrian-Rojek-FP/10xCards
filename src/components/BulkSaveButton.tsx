@@ -86,7 +86,7 @@ export function BulkSaveButton({ flashcards, generationId, onSaveSuccess, onSave
   }
 
   return (
-    <div className="flex gap-3 flex-wrap items-center py-4 border-t">
+    <div className="flex gap-3 flex-wrap items-center">
       <div className="flex-1">
         <p className="text-sm text-muted-foreground">
           {acceptedFlashcards.length > 0 ? (
