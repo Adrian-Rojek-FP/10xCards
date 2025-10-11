@@ -29,17 +29,17 @@ This directory contains example JSON request bodies for testing the API endpoint
 
 ```powershell
 # Valid request (mid-range)
-curl -X POST http://localhost:4321/api/generations `
+curl -X POST http://localhost:3000/api/generations `
   -H "Content-Type: application/json" `
   -d "@examples/sample-generation-request.json"
 
 # Valid request (minimal)
-curl -X POST http://localhost:4321/api/generations `
+curl -X POST http://localhost:3000/api/generations `
   -H "Content-Type: application/json" `
   -d "@examples/sample-generation-minimal.json"
 
 # Invalid request (will return 400 error)
-curl -X POST http://localhost:4321/api/generations `
+curl -X POST http://localhost:3000/api/generations `
   -H "Content-Type: application/json" `
   -d "@examples/sample-generation-invalid.json"
 ```
@@ -48,12 +48,12 @@ curl -X POST http://localhost:4321/api/generations `
 
 ```bash
 # Valid request
-curl -X POST http://localhost:4321/api/generations \
+curl -X POST http://localhost:3000/api/generations \
   -H "Content-Type: application/json" \
   -d @examples/sample-generation-request.json
 
 # Invalid request
-curl -X POST http://localhost:4321/api/generations \
+curl -X POST http://localhost:3000/api/generations \
   -H "Content-Type: application/json" \
   -d @examples/sample-generation-invalid.json
 ```
@@ -62,7 +62,7 @@ curl -X POST http://localhost:4321/api/generations \
 
 ```javascript
 // Valid request
-const response = await fetch('http://localhost:4321/api/generations', {
+const response = await fetch('http://localhost:3000/api/generations', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ console.log(data);
 ### Using Postman or Thunder Client
 
 1. **Method**: POST
-2. **URL**: `http://localhost:4321/api/generations`
+2. **URL**: `http://localhost:3000/api/generations`
 3. **Headers**: 
    - `Content-Type: application/json`
 4. **Body**: 
@@ -206,17 +206,17 @@ This section contains example JSON request bodies for testing the `/api/flashcar
 
 ```powershell
 # Create manual flashcards
-curl -X POST http://localhost:4321/api/flashcards `
+curl -X POST http://localhost:3000/api/flashcards `
   -H "Content-Type: application/json" `
   -d "@examples/flashcards-manual-multiple.json"
 
 # Create AI-generated flashcards
-curl -X POST http://localhost:4321/api/flashcards `
+curl -X POST http://localhost:3000/api/flashcards `
   -H "Content-Type: application/json" `
   -d "@examples/flashcards-ai-generated.json"
 
 # Invalid request (will return 400 error)
-curl -X POST http://localhost:4321/api/flashcards `
+curl -X POST http://localhost:3000/api/flashcards `
   -H "Content-Type: application/json" `
   -d "@examples/flashcards-invalid.json"
 ```
@@ -225,12 +225,12 @@ curl -X POST http://localhost:4321/api/flashcards `
 
 ```bash
 # Create flashcards
-curl -X POST http://localhost:4321/api/flashcards \
+curl -X POST http://localhost:3000/api/flashcards \
   -H "Content-Type: application/json" \
   -d @examples/flashcards-manual-multiple.json
 
 # Invalid request
-curl -X POST http://localhost:4321/api/flashcards \
+curl -X POST http://localhost:3000/api/flashcards \
   -H "Content-Type: application/json" \
   -d @examples/flashcards-invalid.json
 ```
@@ -239,7 +239,7 @@ curl -X POST http://localhost:4321/api/flashcards \
 
 ```javascript
 // Create flashcards
-const response = await fetch('http://localhost:4321/api/flashcards', {
+const response = await fetch('http://localhost:3000/api/flashcards', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -263,7 +263,7 @@ console.log(data);
 ### Using Postman or Thunder Client
 
 1. **Method**: POST
-2. **URL**: `http://localhost:4321/api/flashcards`
+2. **URL**: `http://localhost:3000/api/flashcards`
 3. **Headers**: 
    - `Content-Type: application/json`
 4. **Body**: 
