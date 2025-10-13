@@ -70,14 +70,18 @@ Return your response as a JSON object with a "flashcards" array containing objec
  */
 async function aiServiceGenerateFlashcards(sourceText: string): Promise<FlashcardProposalDto[]> {
   try {
-    // Create OpenRouter service instance
+    // Create OpenRouter service instance with logging
     const openRouter = createOpenRouterService({
       enableMetrics: true,
+      logger: (level, message, data) => {
+        // eslint-disable-next-line no-console
+        console.log(`[OpenRouter ${level.toUpperCase()}] ${message}`, data ? JSON.stringify(data, null, 2) : "");
+      },
     });
 
     // Configure model and parameters
-    // "openai/gpt-4o-mini"
-    openRouter.setModel("openai/gpt-oss-20b", {
+    // Using gpt-4o-mini for better reliability with structured JSON output
+    openRouter.setModel("openai/gpt-4o-mini", {
       temperature: 0.7,
       max_tokens: 2000,
     });
@@ -101,6 +105,7 @@ async function aiServiceGenerateFlashcards(sourceText: string): Promise<Flashcar
     const response = await openRouter.sendChatMessage<AIResponse>(userMessage);
 
     // Log response for debugging
+    // eslint-disable-next-line no-console
     console.log("AI Response:", JSON.stringify(response, null, 2));
 
     // Validate response structure
@@ -132,6 +137,7 @@ async function aiServiceGenerateFlashcards(sourceText: string): Promise<Flashcar
     return flashcardProposals;
   } catch (error) {
     // Log error details
+    // eslint-disable-next-line no-console
     console.error("AI service error:", error);
 
     // Re-throw with more context
@@ -182,8 +188,7 @@ export async function generateFlashcards(
       .from("generations")
       .insert({
         user_id: userId,
-        //model: "openai/gpt-4o-mini",
-        model: "openai/gpt-oss-20b",
+        model: "openai/gpt-4o-mini",
         generated_count: generatedCount,
         source_text_hash: sourceTextHash,
         source_text_length: sourceTextLength,
@@ -193,6 +198,7 @@ export async function generateFlashcards(
       .single();
 
     if (insertError || !generationData) {
+      // eslint-disable-next-line no-console
       console.error("Database insert error:", insertError);
       throw new Error("Failed to save generation metadata to database");
     }
@@ -214,12 +220,12 @@ export async function generateFlashcards(
         user_id: userId,
         error_code: errorCode,
         error_message: errorMessage,
-        // "openai/gpt-4o-mini"
-        model: "openai/gpt-oss-20b",
+        model: "openai/gpt-4o-mini",
         source_text_hash: sourceTextHash,
         source_text_length: sourceText.length,
       });
     } catch (logError) {
+      // eslint-disable-next-line no-console
       console.error("Failed to log generation error:", logError);
     }
 

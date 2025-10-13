@@ -422,7 +422,6 @@ export class OpenRouterService {
     if (this.currentResponseFormat) {
       payload.response_format = {
         type: "json_object",
-        schema: this.currentResponseFormat,
       };
     }
 
@@ -505,16 +504,40 @@ export class OpenRouterService {
   private async handleHttpError(response: Response): Promise<never> {
     const status = response.status;
     let errorMessage = `HTTP ${status}: ${response.statusText}`;
+    let errorDetails = null;
 
-    // Try to parse error details from response body
+    // Try to get response body as text first (to avoid consuming it)
     try {
-      const errorData = await response.json();
-      if (errorData.error?.message) {
-        errorMessage = errorData.error.message;
+      const bodyText = await response.text();
+
+      // Try to parse as JSON
+      try {
+        const errorData = JSON.parse(bodyText);
+        errorDetails = errorData;
+        if (errorData.error?.message) {
+          errorMessage = errorData.error.message;
+        } else if (errorData.error) {
+          errorMessage = JSON.stringify(errorData.error);
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch {
+        // Not valid JSON, use the text as is
+        if (bodyText) {
+          errorMessage = `${errorMessage} - ${bodyText.substring(0, 200)}`;
+        }
       }
     } catch {
-      // Ignore JSON parse errors
+      // Could not read response body
     }
+
+    // Log error details for debugging
+    this.log("error", "HTTP Error from OpenRouter", {
+      status,
+      statusText: response.statusText,
+      errorMessage,
+      errorDetails,
+    });
 
     // Throw specific error based on status code
     if (status === 401 || status === 403) {
@@ -606,14 +629,21 @@ export class OpenRouterService {
    * @throws ValidationError if response is invalid
    */
   private parseResponse<T>(response: ApiResponse): T {
+    // Log the full response for debugging
+    this.log("info", "Parsing API response", {
+      hasChoices: !!response.choices,
+      choicesLength: response.choices?.length || 0,
+      responsePreview: JSON.stringify(response).substring(0, 500),
+    });
+
     // Validate response structure
     if (!response.choices || response.choices.length === 0) {
-      throw new ValidationError("Invalid API response: no choices returned.");
+      throw new ValidationError(`Invalid API response: no choices returned. Response: ${JSON.stringify(response)}`);
     }
 
     const message = response.choices[0]?.message;
     if (!message || !message.content) {
-      throw new ValidationError("Invalid API response: no message content.");
+      throw new ValidationError(`Invalid API response: no message content. Response: ${JSON.stringify(response)}`);
     }
 
     // If response format is JSON, parse it
