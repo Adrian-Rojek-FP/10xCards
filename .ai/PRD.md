@@ -64,6 +64,12 @@ Kryteria akceptacji:
 - Po podaniu prawidłowych danych logowania użytkownik zostaje przekierowany do widoku generowania fiszek.
 - Błędne dane logowania wyświetlają komunikat o nieprawidłowych danych.
 - Dane dotyczące logowania przechowywane są w bezpieczny sposób.
+- Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
+- Użytkownik może się wylogować z systemu poprzez przycisk w prawym górnym rogu w głównym @Layout.astro.
+- Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
+- Odzyskiwanie hasła powinno być możliwe.
+- Użytkownik MOŻE korzystać ze strony głównej bez logowania się do systemu.
+- Użytkownik NIE MOŻE korzystać z funkcji generacji fiszek bez logowania się do systemu (US-003).
 
 ID: US-003
 Tytuł: Generowanie fiszek przy użyciu AI
@@ -73,6 +79,7 @@ Kryteria akceptacji:
 - Pole tekstowe oczekuje od 1000 do 10 000 znaków.
 - Po kliknięciu przycisku generowania aplikacja komunikuje się z API modelu LLM i wyświetla listę wygenerowanych propozycji fiszek do akceptacji przez użytkownika.
 - W przypadku problemów z API lub braku odpowiedzi modelu użytkownik zobaczy stosowny komunikat o błędzie.
+- Funkcjonalność generowania fiszek nie jest dostępna bez logowania się do systemu (US-002).
 
 ID: US-004
 Tytuł: Przegląd i zatwierdzanie propozycji fiszek
