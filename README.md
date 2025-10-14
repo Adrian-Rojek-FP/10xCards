@@ -7,6 +7,7 @@ A web application for rapid flashcard creation and learning, powered by AI and a
 - [Tech Stack](#tech-stack)
 - [Getting Started Locally](#getting-started-locally)
 - [Available Scripts](#available-scripts)
+- [Testing](#testing)
 - [Project Scope](#project-scope)
 - [Project Status](#project-status)
 - [License](#license)
@@ -24,6 +25,7 @@ The learning process is facilitated by a simple, yet effective, Leitner spaced r
 | **Frontend**          | [Astro](https://astro.build/), [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/), [Shadcn/ui](https://ui.shadcn.com/) |
 | **Backend**           | [Supabase](https://supabase.com/) (PostgreSQL, Authentication, BaaS)      |
 | **AI Integration**    | [OpenRouter.ai](https://openrouter.ai/) (Access to various LLMs)        |
+| **Testing**           | [Vitest](https://vitest.dev/) (Unit Tests), [Playwright](https://playwright.dev/) (E2E Tests), [Testing Library](https://testing-library.com/) |
 | **CI/CD & Hosting**   | [GitHub Actions](https://github.com/features/actions), [DigitalOcean](https://www.digitalocean.com/) (Docker) |
 
 ## Getting Started Locally
@@ -68,12 +70,63 @@ Follow these instructions to get the project running on your local machine for d
 
 The following scripts are available in the project:
 
+### Development
 - `npm run dev`: Runs the app in development mode.
 - `npm run build`: Builds the app for production.
 - `npm run preview`: Serves the production build locally for preview.
+
+### Code Quality
 - `npm run lint`: Lints the codebase using ESLint.
 - `npm run lint:fix`: Lints the codebase and automatically fixes issues.
 - `npm run format`: Formats the code using Prettier.
+
+### Testing
+- `npm run test`: Run unit tests in watch mode (Vitest).
+- `npm run test:run`: Run unit tests once.
+- `npm run test:ui`: Run unit tests with UI interface.
+- `npm run test:coverage`: Generate code coverage report.
+- `npm run test:e2e`: Run end-to-end tests (Playwright).
+- `npm run test:e2e:ui`: Run E2E tests with UI interface.
+- `npm run test:e2e:debug`: Debug E2E tests.
+
+For more testing information, see [tests/README.md](tests/README.md) and [TESTING_SETUP.md](TESTING_SETUP.md).
+
+## Testing
+
+The project includes comprehensive testing setup for both unit and E2E tests:
+
+### Unit Tests (Vitest)
+- Component testing with React Testing Library
+- Service and utility function testing
+- Mocking support with `vi` object
+- Watch mode for development
+- Coverage reporting
+
+### E2E Tests (Playwright)
+- Browser automation testing (Chromium)
+- Page Object Model pattern
+- Resilient locators
+- API testing support
+- Visual regression testing
+- Trace viewer for debugging
+
+### Quick Start
+
+Run unit tests:
+```sh
+npm run test
+```
+
+Run E2E tests:
+```sh
+npm run test:e2e
+```
+
+For detailed testing documentation, see:
+- [tests/README.md](tests/README.md) - Full testing guide
+- [tests/QUICK_START.md](tests/QUICK_START.md) - Quick start guide
+- [tests/SNIPPETS.md](tests/SNIPPETS.md) - Code snippets and templates
+- [TESTING_SETUP.md](TESTING_SETUP.md) - Setup documentation
 
 ## Project Scope
 
