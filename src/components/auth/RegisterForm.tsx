@@ -38,15 +38,38 @@ export function RegisterForm({ redirectTo = "/generate" }: RegisterFormProps) {
 
     setIsLoading(true);
 
-    // TODO: Implement Supabase authentication
-    // This will be implemented in the next phase
-    console.log("Registration attempt:", { email, redirectTo });
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    // Simulate API call
-    setTimeout(() => {
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Wystąpił nieznany błąd.");
+      }
+
+      // Show success message
+      setSuccessMessage(
+        data.message ||
+          "Rejestracja przebiegła pomyślnie! Sprawdź swoją skrzynkę e-mail i kliknij link potwierdzający, aby aktywować konto."
+      );
+
+      // If email confirmation is not required, redirect after a short delay
+      if (!data.needsEmailConfirmation) {
+        setTimeout(() => {
+          window.location.href = redirectTo;
+        }, 2000);
+      }
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
       setIsLoading(false);
-      setSuccessMessage("Konto zostało utworzone! Sprawdź swoją skrzynkę e-mail, aby potwierdzić adres.");
-    }, 1000);
+    }
   };
 
   return (
