@@ -39,3 +39,4 @@ lerna-debug.log*
 # OS
 Thumbs.db
 .env.test
+.env.backup
