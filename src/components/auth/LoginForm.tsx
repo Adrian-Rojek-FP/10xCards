@@ -26,15 +26,26 @@ export function LoginForm({ redirectTo = "/generate" }: LoginFormProps) {
 
     setIsLoading(true);
 
-    // TODO: Implement Supabase authentication
-    // This will be implemented in the next phase
-    console.log("Login attempt:", { email, redirectTo });
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    // Simulate API call
-    setTimeout(() => {
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Wystąpił nieznany błąd.');
+      }
+
+      window.location.href = redirectTo;
+    } catch (err: any) {
+      setError(err.message);
       setIsLoading(false);
-      setError("Logowanie jeszcze nie zostało zaimplementowane");
-    }, 1000);
+    }
   };
 
   return (
