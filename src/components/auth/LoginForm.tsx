@@ -27,10 +27,10 @@ export function LoginForm({ redirectTo = "/generate" }: LoginFormProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
@@ -38,12 +38,12 @@ export function LoginForm({ redirectTo = "/generate" }: LoginFormProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Wystąpił nieznany błąd.');
+        throw new Error(data.error || "Wystąpił nieznany błąd.");
       }
 
       window.location.href = redirectTo;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError((err as Error).message);
       setIsLoading(false);
     }
   };

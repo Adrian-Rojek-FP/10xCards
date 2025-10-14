@@ -7,6 +7,7 @@ interface Props {
 }
 
 const { title = "10x Astro Starter" } = Astro.props;
+const { user } = Astro.locals;
 ---
 
 <!doctype html>
@@ -32,7 +33,7 @@ const { title = "10x Astro Starter" } = Astro.props;
     <!-- prettier-ignore-end -->
   </head>
   <body>
-    <AppShell client:load>
+    <AppShell user={user} client:load>
       <slot />
     </AppShell>
   </body>

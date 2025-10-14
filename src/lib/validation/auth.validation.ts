@@ -5,10 +5,7 @@ import { z } from "zod";
  * These can be used both on the client and server side
  */
 
-export const emailSchema = z
-  .string()
-  .min(1, "Adres e-mail jest wymagany")
-  .email("Wprowadź poprawny adres e-mail");
+export const emailSchema = z.string().min(1, "Adres e-mail jest wymagany").email("Wprowadź poprawny adres e-mail");
 
 export const passwordSchema = z
   .string()
@@ -71,4 +68,3 @@ export function isValidPassword(password: string): boolean {
 export function doPasswordsMatch(password: string, confirmPassword: string): boolean {
   return password === confirmPassword && password.length > 0;
 }
-

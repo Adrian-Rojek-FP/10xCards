@@ -45,9 +45,7 @@ export function RegisterForm({ redirectTo = "/generate" }: RegisterFormProps) {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      setSuccessMessage(
-        "Konto zostało utworzone! Sprawdź swoją skrzynkę e-mail, aby potwierdzić adres."
-      );
+      setSuccessMessage("Konto zostało utworzone! Sprawdź swoją skrzynkę e-mail, aby potwierdzić adres.");
     }, 1000);
   };
 
@@ -86,12 +84,7 @@ export function RegisterForm({ redirectTo = "/generate" }: RegisterFormProps) {
           aria-live="polite"
         >
           <div className="flex items-start gap-3">
-            <svg
-              className="size-5 shrink-0 mt-0.5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              aria-hidden="true"
-            >
+            <svg className="size-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
@@ -282,12 +275,7 @@ export function RegisterForm({ redirectTo = "/generate" }: RegisterFormProps) {
       <Button type="submit" disabled={!canSubmit} className="w-full" size="lg">
         {isLoading ? (
           <>
-            <svg
-              className="animate-spin size-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
+            <svg className="animate-spin size-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path
                 className="opacity-75"
@@ -304,11 +292,13 @@ export function RegisterForm({ redirectTo = "/generate" }: RegisterFormProps) {
 
       <p className="text-center text-sm text-muted-foreground">
         Masz już konto?{" "}
-        <a href="/login" className="text-primary font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded">
+        <a
+          href="/login"
+          className="text-primary font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+        >
           Zaloguj się
         </a>
       </p>
     </form>
   );
 }
-
