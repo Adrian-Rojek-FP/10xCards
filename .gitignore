@@ -40,3 +40,5 @@ lerna-debug.log*
 Thumbs.db
 .env.test
 .env.backup
+
+tests/e2e/auth.spec.ts-snapshots

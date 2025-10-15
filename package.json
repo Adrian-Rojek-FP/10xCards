@@ -19,7 +19,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
-    "test:e2e:codegen": "playwright codegen http://localhost:4321",
+    "test:e2e:codegen": "playwright codegen http://localhost:3000",
     "dev:e2e": "astro dev --mode test"
   },
   "dependencies": {
@@ -27,6 +27,7 @@
     "@astrojs/react": "^4.3.1",
     "@astrojs/sitemap": "^3.5.1",
     "@radix-ui/react-slot": "^1.1.2",
+    "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.75.0",
     "@tailwindcss/vite": "^4.1.13",
     "@types/react": "^19.1.12",
