@@ -8,6 +8,7 @@ A web application for rapid flashcard creation and learning, powered by AI and a
 - [Getting Started Locally](#getting-started-locally)
 - [Available Scripts](#available-scripts)
 - [Testing](#testing)
+- [CI/CD](#cicd)
 - [Project Scope](#project-scope)
 - [Project Status](#project-status)
 - [License](#license)
@@ -127,6 +128,36 @@ For detailed testing documentation, see:
 - [tests/QUICK_START.md](tests/QUICK_START.md) - Quick start guide
 - [tests/SNIPPETS.md](tests/SNIPPETS.md) - Code snippets and templates
 - [TESTING_SETUP.md](TESTING_SETUP.md) - Setup documentation
+
+## CI/CD
+
+The project includes automated continuous integration and deployment pipelines using GitHub Actions:
+
+### Automated Checks
+
+Every push to `main` automatically runs:
+- Code linting (ESLint)
+- Unit tests (Vitest)
+- Production build verification
+- E2E tests (Playwright)
+
+### Manual Trigger
+
+You can manually trigger the CI workflow from the GitHub Actions UI.
+
+### Setup
+
+To set up CI/CD for your fork:
+
+1. Add required GitHub secrets:
+   - `PUBLIC_SUPABASE_URL` - Your Supabase project URL
+   - `PUBLIC_SUPABASE_KEY` - Your Supabase anon/public key
+
+2. Optionally add `OPENROUTER_API_KEY` for testing AI features
+
+For detailed CI/CD setup instructions, see:
+- [.github/workflows/README.md](.github/workflows/README.md) - Workflow documentation
+- [.github/SETUP.md](.github/SETUP.md) - Complete setup guide
 
 ## Project Scope
 
