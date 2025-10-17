@@ -1,0 +1,276 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+# Cancel in-progress runs for the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+# Restrict permissions to minimum required
+permissions:
+  contents: read
+  actions: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run linter
+        run: npm run lint
+
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: lint
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run unit tests with coverage
+        run: npm run test:coverage
+      
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/coverage-final.json
+          flags: unit-tests
+          name: unit-test-coverage
+          fail_ci_if_error: false
+      
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-coverage
+          path: coverage/
+          retention-days: 7
+          if-no-files-found: warn
+
+  e2e-test:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: lint
+    environment: integration
+    
+    env:
+      NODE_ENV: test
+      CI: true
+      # Public env vars (browser-side)
+      PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+      PUBLIC_SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
+      # Server-side env vars (middleware & API routes)
+      SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
+      # Optional: OpenRouter API for flashcard generation
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      # Base URL for E2E tests
+      BASE_URL: http://localhost:3000
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+      
+      - name: Build application
+        run: npm run build
+      
+      - name: Run E2E tests
+        run: npm run test:e2e
+      
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: warn
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_id }}
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: warn
+      
+      - name: Upload E2E coverage (if available)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-coverage
+          path: coverage/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  status-comment:
+    name: PR Status Comment
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [lint, unit-test, e2e-test]
+    if: success()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Download unit test coverage
+        uses: actions/download-artifact@v5
+        with:
+          name: unit-test-coverage
+          path: coverage-unit/
+        continue-on-error: true
+      
+      - name: Download E2E test coverage
+        uses: actions/download-artifact@v5
+        with:
+          name: e2e-test-coverage
+          path: coverage-e2e/
+        continue-on-error: true
+      
+      - name: Download Playwright report
+        uses: actions/download-artifact@v5
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: playwright-report/
+        continue-on-error: true
+      
+      - name: Generate PR comment
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Collect coverage data
+            let unitCoverage = 'N/A';
+            let e2eCoverage = 'N/A';
+            
+            try {
+              const unitCoveragePath = 'coverage-unit/coverage-summary.json';
+              if (fs.existsSync(unitCoveragePath)) {
+                const coverage = JSON.parse(fs.readFileSync(unitCoveragePath, 'utf8'));
+                const total = coverage.total;
+                unitCoverage = `${total.lines.pct.toFixed(2)}% lines, ${total.statements.pct.toFixed(2)}% statements`;
+              }
+            } catch (error) {
+              console.log('Could not read unit test coverage:', error.message);
+            }
+            
+            try {
+              const e2eCoveragePath = 'coverage-e2e/coverage-summary.json';
+              if (fs.existsSync(e2eCoveragePath)) {
+                const coverage = JSON.parse(fs.readFileSync(e2eCoveragePath, 'utf8'));
+                const total = coverage.total;
+                e2eCoverage = `${total.lines.pct.toFixed(2)}% lines, ${total.statements.pct.toFixed(2)}% statements`;
+              }
+            } catch (error) {
+              console.log('Could not read E2E test coverage:', error.message);
+            }
+            
+            // Build comment body
+            const comment = `## ✅ Pull Request Validation Passed
+            
+            All checks have completed successfully! 🎉
+            
+            ### 📊 Test Results Summary
+            
+            | Check | Status | Details |
+            |-------|--------|---------|
+            | **Linting** | ✅ Passed | Code quality standards met |
+            | **Unit Tests** | ✅ Passed | Coverage: ${unitCoverage} |
+            | **E2E Tests** | ✅ Passed | Coverage: ${e2eCoverage} |
+            
+            ### 🔗 Useful Links
+            
+            - [View workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [View Playwright report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            
+            ### 📦 Build Information
+            
+            - **Commit**: \`${{ github.event.pull_request.head.sha }}\`
+            - **Branch**: \`${{ github.event.pull_request.head.ref }}\`
+            - **Workflow**: \`${{ github.workflow }}\`
+            - **Run ID**: \`${{ github.run_id }}\`
+            
+            ---
+            
+            *This PR is ready to be reviewed and merged.* 🚀`;
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Pull Request Validation')
+            );
+            
+            // Create or update comment
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment,
+              });
+            }
+

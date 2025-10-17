@@ -4,7 +4,11 @@
 
 ### Overview
 
-This repository uses GitHub Actions for continuous integration and deployment. The main workflow is defined in `ci.yml`.
+This repository uses GitHub Actions for continuous integration and deployment. We have two main workflows:
+- **`ci.yml`** - Continuous Integration for main branch
+- **`pull-request.yml`** - Pull Request validation with status comments
+
+For detailed documentation on the Pull Request workflow, see [README-pull-request.md](./README-pull-request.md).
 
 ### Workflow: Test & Build (`ci.yml`)
 

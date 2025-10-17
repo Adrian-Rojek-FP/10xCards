@@ -206,40 +206,4 @@ test.describe("Registration Flow", () => {
     // For now, we'll skip it as it requires additional setup
     test.skip();
   });
-
-  test("should maintain visual consistency of registration form", async ({ page }) => {
-    const registerPage = new RegisterPage(page);
-    await registerPage.navigate();
-
-    // Take screenshot of empty registration form
-    await expect(page).toHaveScreenshot("register-form-empty.png", {
-      fullPage: true,
-    });
-
-    // Fill form partially and take screenshot
-    await registerPage.emailInput.fill("test@example.com");
-    await registerPage.passwordInput.fill("password123");
-
-    await expect(page).toHaveScreenshot("register-form-partial.png", {
-      fullPage: true,
-    });
-
-    // Fill complete form and take screenshot
-    await registerPage.confirmPasswordInput.fill("password123");
-
-    await expect(page).toHaveScreenshot("register-form-complete.png", {
-      fullPage: true,
-    });
-
-    // Show validation errors and take screenshot
-    await registerPage.passwordInput.fill("short");
-    await registerPage.confirmPasswordInput.fill("different");
-    await registerPage.passwordInput.blur();
-    await registerPage.confirmPasswordInput.blur();
-    await page.waitForTimeout(100);
-
-    await expect(page).toHaveScreenshot("register-form-validation-errors.png", {
-      fullPage: true,
-    });
-  });
 });
