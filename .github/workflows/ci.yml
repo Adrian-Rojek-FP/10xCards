@@ -71,8 +71,14 @@ jobs:
     
     env:
       NODE_ENV: production
+      # Public env vars (browser-side)
       PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
       PUBLIC_SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
+      # Server-side env vars (middleware & API routes)
+      SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
+      # Optional: OpenRouter API for flashcard generation
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
     
     steps:
       - name: Checkout code
@@ -107,8 +113,14 @@ jobs:
     env:
       NODE_ENV: test
       CI: true
+      # Public env vars (browser-side)
       PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
       PUBLIC_SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
+      # Server-side env vars (middleware & API routes)
+      SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
+      # Optional: OpenRouter API for flashcard generation
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
     
     steps:
       - name: Checkout code

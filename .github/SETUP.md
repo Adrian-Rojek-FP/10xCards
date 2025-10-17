@@ -15,28 +15,38 @@ npm install
 Utwórz plik `.env` w głównym katalogu projektu:
 
 ```env
-# Supabase Configuration
+# Supabase Configuration (Browser-side)
 PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 PUBLIC_SUPABASE_KEY=your-anon-key-here
+
+# Supabase Configuration (Server-side - same values as above)
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_KEY=your-anon-key-here
 
 # Optional - dla generowania flashcards
 OPENROUTER_API_KEY=your-openrouter-api-key-here
 ```
+
+**Uwaga**: `SUPABASE_URL` i `SUPABASE_KEY` powinny mieć te same wartości co `PUBLIC_SUPABASE_URL` i `PUBLIC_SUPABASE_KEY`. Aplikacja wymaga obu zestawów dla różnych warstw (klient/serwer).
 
 #### Krok 3: Skonfiguruj środowisko testowe
 
 Utwórz plik `.env.test` dla testów E2E:
 
 ```env
-# Supabase Test Configuration
+# Supabase Test Configuration (Browser-side)
 PUBLIC_SUPABASE_URL=https://your-test-project-id.supabase.co
 PUBLIC_SUPABASE_KEY=your-test-anon-key-here
+
+# Supabase Test Configuration (Server-side - same values as above)
+SUPABASE_URL=https://your-test-project-id.supabase.co
+SUPABASE_KEY=your-test-anon-key-here
 
 # Base URL dla testów E2E
 BASE_URL=http://localhost:3000
 ```
 
-**Uwaga**: Zaleca się używanie oddzielnej instancji Supabase dla testów.
+**Uwaga**: Zaleca się używanie oddzielnej instancji Supabase dla testów. Wartości `SUPABASE_URL/KEY` powinny być identyczne z `PUBLIC_SUPABASE_URL/KEY`.
 
 #### Krok 4: Uruchom testy lokalnie
 
@@ -77,6 +87,8 @@ npm run test:e2e
 | `PUBLIC_SUPABASE_URL` | URL projektu Supabase | ✅ Tak |
 | `PUBLIC_SUPABASE_KEY` | Klucz anon/public Supabase | ✅ Tak |
 | `OPENROUTER_API_KEY` | Klucz API OpenRouter | ❌ Opcjonalnie |
+
+**Uwaga**: W CI workflow, wartości `SUPABASE_URL` i `SUPABASE_KEY` (bez prefiksu PUBLIC_) są automatycznie mapowane z secrets `PUBLIC_SUPABASE_URL` i `PUBLIC_SUPABASE_KEY`. Nie musisz dodawać oddzielnych secrets.
 
 #### Krok 3: Zweryfikuj workflow
 

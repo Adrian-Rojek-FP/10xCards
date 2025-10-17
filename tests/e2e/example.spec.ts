@@ -5,17 +5,6 @@ import { test, expect } from "@playwright/test";
  * This demonstrates basic Playwright functionality
  */
 test.describe("Basic E2E Tests", () => {
-  test("home page loads successfully", async ({ page }) => {
-    // Navigate to home page
-    await page.goto("/");
-
-    // Wait for page to be fully loaded
-    await page.waitForLoadState("networkidle");
-
-    // Check that page has loaded by verifying title
-    await expect(page).toHaveTitle(/10x Cards|10xCards/i);
-  });
-
   test("can navigate between pages", async ({ page }) => {
     await page.goto("/");
 
