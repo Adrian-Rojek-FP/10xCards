@@ -1,18 +1,18 @@
-import { test, expect } from '@playwright/test';
-import { RegisterPage } from './pages/RegisterPage';
-import { LoginPage } from './pages/LoginPage';
-import { HomePage } from './pages/HomePage';
+import { test, expect } from "@playwright/test";
+import { RegisterPage } from "./pages/RegisterPage";
+import { LoginPage } from "./pages/LoginPage";
+import { HomePage } from "./pages/HomePage";
 
 /**
  * E2E tests for complete registration to first login flow
  * Tests the entire user journey from account creation to successful login
  */
-test.describe('Complete Registration to Login Flow', () => {
+test.describe("Complete Registration to Login Flow", () => {
   // Generate unique test email to avoid conflicts
   const getUniqueEmail = () => `test-${Date.now()}@example.com`;
-  const testPassword = 'password123';
+  const testPassword = "password123";
 
-  test('should complete full registration and first login flow', async ({ page }) => {
+  test("should complete full registration and first login flow", async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
@@ -47,7 +47,7 @@ test.describe('Complete Registration to Login Flow', () => {
     // Step 8: Check registration outcome
     const hasSuccessMessage = await registerPage.hasSuccessMessage();
     const hasError = await registerPage.hasError();
-    const isRedirected = page.url().includes('/generate');
+    const isRedirected = page.url().includes("/generate");
 
     // Registration should either succeed or show appropriate message
     expect(hasSuccessMessage || hasError || isRedirected).toBe(true);
@@ -62,7 +62,7 @@ test.describe('Complete Registration to Login Flow', () => {
     // If not redirected, check for success message
     if (hasSuccessMessage) {
       const successText = await registerPage.getSuccessMessage();
-      expect(successText).toContain('pomyślnie');
+      expect(successText).toContain("pomyślnie");
     }
 
     // Step 9: Navigate to login page
@@ -78,7 +78,7 @@ test.describe('Complete Registration to Login Flow', () => {
     await loginPage.waitForLoginResult();
 
     // Step 13: Verify successful login
-    const loginSuccessful = page.url().includes('/generate');
+    const loginSuccessful = page.url().includes("/generate");
     const hasLoginError = await loginPage.hasError();
 
     expect(loginSuccessful || !hasLoginError).toBe(true);
@@ -89,7 +89,7 @@ test.describe('Complete Registration to Login Flow', () => {
     }
   });
 
-  test('should handle registration with email confirmation flow', async ({ page }) => {
+  test("should handle registration with email confirmation flow", async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const loginPage = new LoginPage(page);
 
@@ -107,7 +107,7 @@ test.describe('Complete Registration to Login Flow', () => {
     expect(await registerPage.hasSuccessMessage()).toBe(true);
 
     const successMessage = await registerPage.getSuccessMessage();
-    expect(successMessage).toContain('e-mail');
+    expect(successMessage).toContain("e-mail");
 
     // Try to login before email confirmation (should fail)
     await registerPage.goToLogin();
@@ -121,7 +121,7 @@ test.describe('Complete Registration to Login Flow', () => {
     // This test demonstrates the expected flow
   });
 
-  test('should handle registration and immediate login attempt', async ({ page }) => {
+  test("should handle registration and immediate login attempt", async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const loginPage = new LoginPage(page);
 
@@ -139,13 +139,13 @@ test.describe('Complete Registration to Login Flow', () => {
     await loginPage.waitForLoginResult();
 
     // Should either succeed or show appropriate error
-    const loginSuccessful = page.url().includes('/generate');
+    const loginSuccessful = page.url().includes("/generate");
     const hasError = await loginPage.hasError();
 
     expect(loginSuccessful || hasError).toBe(true);
   });
 
-  test('should handle form data persistence across navigation', async ({ page }) => {
+  test("should handle form data persistence across navigation", async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const loginPage = new LoginPage(page);
 
@@ -167,12 +167,12 @@ test.describe('Complete Registration to Login Flow', () => {
     const confirmValue = await registerPage.confirmPasswordInput.inputValue();
 
     // Form should be cleared for security (recommended)
-    expect(emailValue).toBe('');
-    expect(passwordValue).toBe('');
-    expect(confirmValue).toBe('');
+    expect(emailValue).toBe("");
+    expect(passwordValue).toBe("");
+    expect(confirmValue).toBe("");
   });
 
-  test('should complete flow with password visibility toggles', async ({ page }) => {
+  test("should complete flow with password visibility toggles", async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const loginPage = new LoginPage(page);
 
@@ -190,10 +190,10 @@ test.describe('Complete Registration to Login Flow', () => {
     await registerPage.toggleConfirmPasswordVisibility();
 
     // Verify password is visible
-    let passwordType = await registerPage.passwordInput.getAttribute('type');
-    let confirmType = await registerPage.confirmPasswordInput.getAttribute('type');
-    expect(passwordType).toBe('text');
-    expect(confirmType).toBe('text');
+    let passwordType = await registerPage.passwordInput.getAttribute("type");
+    const confirmType = await registerPage.confirmPasswordInput.getAttribute("type");
+    expect(passwordType).toBe("text");
+    expect(confirmType).toBe("text");
 
     // Submit registration
     await registerPage.registerButton.click();
@@ -210,27 +210,28 @@ test.describe('Complete Registration to Login Flow', () => {
     await loginPage.togglePasswordVisibility();
 
     // Verify password is visible
-    passwordType = await loginPage.passwordInput.getAttribute('type');
-    expect(passwordType).toBe('text');
+    passwordType = await loginPage.passwordInput.getAttribute("type");
+    expect(passwordType).toBe("text");
 
     // Submit login
     await loginPage.loginButton.click();
     await loginPage.waitForLoginResult();
 
     // Verify successful login
-    const loginSuccessful = page.url().includes('/generate');
+    const loginSuccessful = page.url().includes("/generate");
     expect(loginSuccessful).toBe(true);
   });
 
-  test('should handle browser back/forward navigation during flow', async ({ page }) => {
+  test("should handle browser back/forward navigation during flow", async ({ page }) => {
     const registerPage = new RegisterPage(page);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const loginPage = new LoginPage(page);
 
     // Start on home page
-    await page.goto('/');
+    await page.goto("/");
 
     // Navigate to registration
-    await page.goto('/register');
+    await page.goto("/register");
 
     // Fill registration form
     const testEmail = getUniqueEmail();
@@ -248,10 +249,10 @@ test.describe('Complete Registration to Login Flow', () => {
 
     // Verify form data is cleared (for security)
     const emailValue = await registerPage.emailInput.inputValue();
-    expect(emailValue).toBe('');
+    expect(emailValue).toBe("");
   });
 
-  test('should handle multiple tabs/windows during registration flow', async ({ context, page }) => {
+  test("should handle multiple tabs/windows during registration flow", async ({ context, page }) => {
     // Open registration in new tab
     const registerPage = new RegisterPage(page);
     await registerPage.navigate();
@@ -280,13 +281,13 @@ test.describe('Complete Registration to Login Flow', () => {
     await loginPage.waitForLoginResult();
 
     // Both should work independently
-    const registerSuccess = await registerPage.hasSuccessMessage() || page.url().includes('/generate');
-    const loginSuccess = newPage.url().includes('/generate') || await loginPage.hasError() === false;
+    const registerSuccess = (await registerPage.hasSuccessMessage()) || page.url().includes("/generate");
+    const loginSuccess = newPage.url().includes("/generate") || (await loginPage.hasError()) === false;
 
     expect(registerSuccess || loginSuccess).toBe(true);
   });
 
-  test('should handle network interruptions during registration', async ({ page }) => {
+  test("should handle network interruptions during registration", async ({ page }) => {
     const registerPage = new RegisterPage(page);
 
     // This test would require network mocking
@@ -301,7 +302,7 @@ test.describe('Complete Registration to Login Flow', () => {
     // This would need Playwright's request interception
   });
 
-  test('should validate complete user journey accessibility', async ({ page }) => {
+  test("should validate complete user journey accessibility", async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const loginPage = new LoginPage(page);
 
@@ -309,33 +310,33 @@ test.describe('Complete Registration to Login Flow', () => {
     await registerPage.navigate();
 
     // Navigate through registration form with keyboard
-    await page.keyboard.press('Tab'); // Email
+    await page.keyboard.press("Tab"); // Email
     await page.keyboard.type(getUniqueEmail());
-    await page.keyboard.press('Tab'); // Password
+    await page.keyboard.press("Tab"); // Password
     await page.keyboard.type(testPassword);
-    await page.keyboard.press('Tab'); // Confirm password
+    await page.keyboard.press("Tab"); // Confirm password
     await page.keyboard.type(testPassword);
-    await page.keyboard.press('Tab'); // Register button
-    await page.keyboard.press('Enter'); // Submit
+    await page.keyboard.press("Tab"); // Register button
+    await page.keyboard.press("Enter"); // Submit
 
     // Wait for result
     await registerPage.waitForRegistrationResult();
 
     // Navigate to login
-    await page.keyboard.press('Tab'); // Login link
-    await page.keyboard.press('Enter');
+    await page.keyboard.press("Tab"); // Login link
+    await page.keyboard.press("Enter");
 
     // Navigate through login form
-    await page.keyboard.press('Tab'); // Email
+    await page.keyboard.press("Tab"); // Email
     await page.keyboard.type(getUniqueEmail());
-    await page.keyboard.press('Tab'); // Password
+    await page.keyboard.press("Tab"); // Password
     await page.keyboard.type(testPassword);
-    await page.keyboard.press('Tab'); // Login button
-    await page.keyboard.press('Enter'); // Submit
+    await page.keyboard.press("Tab"); // Login button
+    await page.keyboard.press("Enter"); // Submit
 
     // Verify successful completion
     await loginPage.waitForLoginResult();
-    const loginSuccessful = page.url().includes('/generate');
+    const loginSuccessful = page.url().includes("/generate");
     expect(loginSuccessful).toBe(true);
   });
 });

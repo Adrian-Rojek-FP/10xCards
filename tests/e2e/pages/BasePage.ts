@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator } from "@playwright/test";
 
 /**
  * Base Page Object Model class with common functionality
@@ -29,7 +29,7 @@ export class BasePage {
    * Wait for page to be fully loaded
    */
   async waitForPageLoad(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState("networkidle");
   }
 
   /**
@@ -43,7 +43,7 @@ export class BasePage {
    * Wait for an element to be visible
    */
   async waitForElement(locator: Locator, timeout = 5000): Promise<void> {
-    await locator.waitFor({ state: 'visible', timeout });
+    await locator.waitFor({ state: "visible", timeout });
   }
 
   /**
@@ -53,4 +53,3 @@ export class BasePage {
     return await locator.isVisible();
   }
 }
-

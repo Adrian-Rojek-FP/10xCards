@@ -295,9 +295,7 @@ describe("registerSchema", () => {
       const result = registerSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
-        const confirmPasswordError = result.error.issues.find(
-          (issue) => issue.path[0] === "confirmPassword"
-        );
+        const confirmPasswordError = result.error.issues.find((issue) => issue.path[0] === "confirmPassword");
         expect(confirmPasswordError?.message).toBe("Hasła nie są identyczne");
       }
     });
@@ -460,9 +458,7 @@ describe("updatePasswordSchema", () => {
       const result = updatePasswordSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
-        const confirmPasswordError = result.error.issues.find(
-          (issue) => issue.path[0] === "confirmPassword"
-        );
+        const confirmPasswordError = result.error.issues.find((issue) => issue.path[0] === "confirmPassword");
         expect(confirmPasswordError?.message).toBe("Hasła nie są identyczne");
       }
     });
@@ -700,4 +696,3 @@ describe("Type exports", () => {
     expect(updateData.confirmPassword).toBeDefined();
   });
 });
-

@@ -1,5 +1,5 @@
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { Page, Locator } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
 /**
  * Page Object Model for Home Page
@@ -12,18 +12,18 @@ export class HomePage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
-    this.welcomeHeading = page.getByRole('heading', { level: 1 });
-    this.loginLink = page.getByRole('link', { name: /login|sign in|zaloguj/i });
-    this.registerLink = page.getByRole('link', { name: /register|sign up|zarejestruj/i });
-    this.generateLink = page.getByRole('link', { name: /generate|generuj/i });
+
+    this.welcomeHeading = page.getByRole("heading", { level: 1 });
+    this.loginLink = page.getByRole("link", { name: /login|sign in|zaloguj/i });
+    this.registerLink = page.getByRole("link", { name: /register|sign up|zarejestruj/i });
+    this.generateLink = page.getByRole("link", { name: /generate|generuj/i });
   }
 
   /**
    * Navigate to home page
    */
   async navigate(): Promise<void> {
-    await this.goto('/');
+    await this.goto("/");
     await this.waitForPageLoad();
   }
 
@@ -32,7 +32,7 @@ export class HomePage extends BasePage {
    */
   async isOnHomePage(): Promise<boolean> {
     const url = this.page.url();
-    return url.endsWith('/') || url.endsWith('/index');
+    return url.endsWith("/") || url.endsWith("/index");
   }
 
   /**
@@ -56,4 +56,3 @@ export class HomePage extends BasePage {
     await this.generateLink.click();
   }
 }
-

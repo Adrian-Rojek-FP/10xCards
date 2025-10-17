@@ -37,10 +37,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
     }
     // Generic error for other cases
-    return new Response(
-      JSON.stringify({ error: "Wystąpił nieoczekiwany błąd. Spróbuj ponownie później." }),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: "Wystąpił nieoczekiwany błąd. Spróbuj ponownie później." }), {
+      status: 500,
+    });
   }
 
   // Check if email confirmation is required
@@ -57,4 +56,3 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     { status: 200 }
   );
 };
-

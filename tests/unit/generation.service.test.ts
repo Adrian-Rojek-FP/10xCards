@@ -52,7 +52,9 @@ describe("generation.service", () => {
     } as unknown as SupabaseClient;
 
     // Mock console methods to avoid cluttering test output
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     vi.spyOn(console, "log").mockImplementation(() => {});
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
@@ -358,7 +360,6 @@ describe("generation.service", () => {
       const sourceText = "Test content";
       const userId = "user-123";
 
-      // eslint-disable-next-line prefer-promise-reject-errors
       mockSendChatMessage.mockRejectedValue("string error");
 
       const mockErrorInsert = vi.fn().mockResolvedValue({ data: null, error: null });
@@ -443,10 +444,7 @@ describe("generation.service", () => {
         "Failed to generate flashcards: AI failed"
       );
 
-      expect(console.error).toHaveBeenCalledWith(
-        "Failed to log generation error:",
-        expect.any(Error)
-      );
+      expect(console.error).toHaveBeenCalledWith("Failed to log generation error:", expect.any(Error));
     });
   });
 
@@ -516,9 +514,7 @@ describe("generation.service", () => {
       expect(result.flashcards_proposals[0].front).toBe("What is H₂O?");
       expect(result.flashcards_proposals[0].back).toBe("Water molecule: H₂O = 2 hydrogen + 1 oxygen");
       expect(result.flashcards_proposals[1].front).toBe('What does "DNA" stand for?');
-      expect(result.flashcards_proposals[1].back).toBe(
-        "Deoxyribonucleic acid (with quotes & symbols)"
-      );
+      expect(result.flashcards_proposals[1].back).toBe("Deoxyribonucleic acid (with quotes & symbols)");
     });
   });
 
@@ -643,10 +639,7 @@ describe("generation.service", () => {
       await generateFlashcards(sourceText, userId, mockSupabase);
 
       // Assert
-      expect(console.log).toHaveBeenCalledWith(
-        "AI Response:",
-        expect.stringContaining('"flashcards"')
-      );
+      expect(console.log).toHaveBeenCalledWith("AI Response:", expect.stringContaining('"flashcards"'));
     });
   });
 
@@ -694,10 +687,7 @@ describe("generation.service", () => {
       // Assert
       expect(result.generated_count).toBe(1);
       // Verify chat message includes formatted text
-      expect(mockSendChatMessage).toHaveBeenCalledWith(
-        expect.stringContaining(sourceText)
-      );
+      expect(mockSendChatMessage).toHaveBeenCalledWith(expect.stringContaining(sourceText));
     });
   });
 });
-

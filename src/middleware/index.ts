@@ -24,7 +24,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   } = await supabase.auth.getUser();
   context.locals.user = user;
 
-
   // Protect routes based on the authenticated user
   if (PROTECTED_PATHS.some((path) => url.pathname.startsWith(path)) && !user) {
     return redirect("/login");

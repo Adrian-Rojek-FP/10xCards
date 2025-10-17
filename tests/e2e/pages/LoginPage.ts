@@ -1,5 +1,5 @@
-import type { Page, Locator } from '@playwright/test';
-import { BasePage } from './BasePage';
+import type { Page, Locator } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
 /**
  * Page Object Model for Login Page
@@ -19,16 +19,16 @@ export class LoginPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators
     this.emailInput = page.getByLabel(/adres e-mail|email/i);
     this.passwordInput = page.getByLabel(/hasło|password/i);
-    this.loginButton = page.getByRole('button', { name: /sign in|login|zaloguj/i });
-    this.errorMessage = page.getByRole('alert');
-    this.registerLink = page.getByRole('link', { name: /sign up|register|zarejestruj/i });
-    this.passwordResetLink = page.getByRole('link', { name: /forgot password|reset|zapomnia/i });
-    this.emailError = page.locator('#email-error');
-    this.passwordError = page.locator('#password-error');
+    this.loginButton = page.getByRole("button", { name: /sign in|login|zaloguj/i });
+    this.errorMessage = page.getByRole("alert");
+    this.registerLink = page.getByRole("link", { name: /sign up|register|zarejestruj/i });
+    this.passwordResetLink = page.getByRole("link", { name: /forgot password|reset|zapomnia/i });
+    this.emailError = page.locator("#email-error");
+    this.passwordError = page.locator("#password-error");
     this.showPasswordButton = page.locator('button[aria-label*="hasło"]').first();
   }
 
@@ -36,7 +36,7 @@ export class LoginPage extends BasePage {
    * Navigate to login page
    */
   async navigate(): Promise<void> {
-    await this.goto('/login');
+    await this.goto("/login");
     await this.waitForPageLoad();
   }
 
@@ -61,7 +61,7 @@ export class LoginPage extends BasePage {
    */
   async getErrorMessage(): Promise<string> {
     await this.waitForElement(this.errorMessage);
-    return await this.errorMessage.textContent() || '';
+    return (await this.errorMessage.textContent()) || "";
   }
 
   /**
@@ -108,7 +108,7 @@ export class LoginPage extends BasePage {
    */
   async getEmailError(): Promise<string> {
     await this.waitForElement(this.emailError);
-    return await this.emailError.textContent() || '';
+    return (await this.emailError.textContent()) || "";
   }
 
   /**
@@ -116,7 +116,7 @@ export class LoginPage extends BasePage {
    */
   async getPasswordError(): Promise<string> {
     await this.waitForElement(this.passwordError);
-    return await this.passwordError.textContent() || '';
+    return (await this.passwordError.textContent()) || "";
   }
 
   /**
@@ -146,8 +146,7 @@ export class LoginPage extends BasePage {
   async waitForLoginResult(): Promise<void> {
     await Promise.race([
       this.waitForElement(this.errorMessage),
-      this.page.waitForURL(/\/generate/, { timeout: 10000 })
+      this.page.waitForURL(/\/generate/, { timeout: 10000 }),
     ]);
   }
 }
-

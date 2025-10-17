@@ -18,8 +18,8 @@ const { user } = Astro.locals;
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
-    <!-- prettier-ignore-start -->
     <script is:inline>
+      /* eslint-disable prettier/prettier */
       (function () {
         const e = "ui-theme";
         const t = (typeof localStorage !== "undefined" && localStorage.getItem(e)) || "dark";
@@ -29,8 +29,8 @@ const { user } = Astro.locals;
           document.documentElement.classList.add("dark");
         }
       })();
+      /* eslint-enable prettier/prettier */
     </script>
-    <!-- prettier-ignore-end -->
   </head>
   <body>
     <AppShell user={user} client:load>

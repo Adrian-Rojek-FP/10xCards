@@ -1,5 +1,5 @@
-import type { Page, Locator } from '@playwright/test';
-import { BasePage } from './BasePage';
+import type { Page, Locator } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
 /**
  * Page Object Model for Register Page
@@ -27,13 +27,13 @@ export class RegisterPage extends BasePage {
     this.emailInput = page.getByLabel(/adres e-mail|email/i);
     this.passwordInput = page.getByLabel(/^hasło$/i);
     this.confirmPasswordInput = page.getByLabel(/potwierdź hasło|confirm password/i);
-    this.registerButton = page.getByRole('button', { name: /zarejestruj|register|sign up/i });
-    this.errorMessage = page.getByRole('alert');
+    this.registerButton = page.getByRole("button", { name: /zarejestruj|register|sign up/i });
+    this.errorMessage = page.getByRole("alert");
     this.successMessage = page.locator('[role="status"]');
-    this.loginLink = page.getByRole('link', { name: /zaloguj|login|sign in/i });
-    this.emailError = page.locator('#email-error');
-    this.passwordError = page.locator('#password-error');
-    this.confirmPasswordError = page.locator('#confirm-password-error');
+    this.loginLink = page.getByRole("link", { name: /zaloguj|login|sign in/i });
+    this.emailError = page.locator("#email-error");
+    this.passwordError = page.locator("#password-error");
+    this.confirmPasswordError = page.locator("#confirm-password-error");
     this.showPasswordButton = page.locator('button[aria-label*="hasło"]').first();
     this.showConfirmPasswordButton = page.locator('button[aria-label*="hasło"]').last();
   }
@@ -42,7 +42,7 @@ export class RegisterPage extends BasePage {
    * Navigate to register page
    */
   async navigate(): Promise<void> {
-    await this.goto('/register');
+    await this.goto("/register");
     await this.waitForPageLoad();
   }
 
@@ -84,7 +84,7 @@ export class RegisterPage extends BasePage {
    */
   async getErrorMessage(): Promise<string> {
     await this.waitForElement(this.errorMessage);
-    return await this.errorMessage.textContent() || '';
+    return (await this.errorMessage.textContent()) || "";
   }
 
   /**
@@ -92,7 +92,7 @@ export class RegisterPage extends BasePage {
    */
   async getSuccessMessage(): Promise<string> {
     await this.waitForElement(this.successMessage);
-    return await this.successMessage.textContent() || '';
+    return (await this.successMessage.textContent()) || "";
   }
 
   /**
@@ -121,7 +121,7 @@ export class RegisterPage extends BasePage {
    */
   async getEmailError(): Promise<string> {
     await this.waitForElement(this.emailError);
-    return await this.emailError.textContent() || '';
+    return (await this.emailError.textContent()) || "";
   }
 
   /**
@@ -129,7 +129,7 @@ export class RegisterPage extends BasePage {
    */
   async getPasswordError(): Promise<string> {
     await this.waitForElement(this.passwordError);
-    return await this.passwordError.textContent() || '';
+    return (await this.passwordError.textContent()) || "";
   }
 
   /**
@@ -137,7 +137,7 @@ export class RegisterPage extends BasePage {
    */
   async getConfirmPasswordError(): Promise<string> {
     await this.waitForElement(this.confirmPasswordError);
-    return await this.confirmPasswordError.textContent() || '';
+    return (await this.confirmPasswordError.textContent()) || "";
   }
 
   /**
@@ -194,7 +194,7 @@ export class RegisterPage extends BasePage {
     await Promise.race([
       this.waitForElement(this.successMessage),
       this.waitForElement(this.errorMessage),
-      this.page.waitForURL(/\/generate/, { timeout: 10000 })
+      this.page.waitForURL(/\/generate/, { timeout: 10000 }),
     ]);
   }
 }
