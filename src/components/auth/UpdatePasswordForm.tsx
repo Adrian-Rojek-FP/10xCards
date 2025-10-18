@@ -19,12 +19,18 @@ export function UpdatePasswordForm() {
   React.useEffect(() => {
     const supabase = getSupabaseBrowserClient();
 
-    // Debug: Check URL
+    // Debug: Check URL and cookies
     if (typeof window !== "undefined") {
       // eslint-disable-next-line no-console
       console.log("[Password Reset Debug - Client] URL Hash:", window.location.hash);
       // eslint-disable-next-line no-console
       console.log("[Password Reset Debug - Client] URL Search:", window.location.search);
+      // eslint-disable-next-line no-console
+      console.log("[Password Reset Debug - Client] All cookies:", document.cookie);
+      // Check for Supabase-specific cookies
+      const hasAuthCookies = document.cookie.includes("sb-") || document.cookie.includes("supabase");
+      // eslint-disable-next-line no-console
+      console.log("[Password Reset Debug - Client] Has Supabase cookies:", hasAuthCookies);
     }
 
     // Listen for auth state changes
@@ -45,13 +51,35 @@ export function UpdatePasswordForm() {
       // Give some time for auth state to settle
       await new Promise((resolve) => setTimeout(resolve, 300));
 
+      // Try to refresh session first - this ensures browser picks up server-set cookies
+      // eslint-disable-next-line no-console
+      console.log("[Password Reset Debug - Client] Attempting to refresh session...");
+      
+      const {
+        data: { session: refreshedSession },
+        error: refreshError,
+      } = await supabase.auth.refreshSession();
+
+      // eslint-disable-next-line no-console
+      console.log("[Password Reset Debug - Client] Refresh session result:", {
+        hasSession: !!refreshedSession,
+        error: refreshError?.message,
+      });
+
+      if (refreshedSession) {
+        setHasValidSession(true);
+        setIsCheckingSession(false);
+        return;
+      }
+
+      // If refresh didn't work, try getSession
       const {
         data: { session },
         error: sessionError,
       } = await supabase.auth.getSession();
 
       // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug - Client] Session check result:", {
+      console.log("[Password Reset Debug - Client] Get session result:", {
         hasSession: !!session,
         error: sessionError?.message,
       });
