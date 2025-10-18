@@ -10,11 +10,7 @@ interface RatingButtonsProps {
   disabled?: boolean;
 }
 
-export default function RatingButtons({
-  onRate,
-  isSubmitting,
-  disabled = false,
-}: RatingButtonsProps) {
+export default function RatingButtons({ onRate, isSubmitting, disabled = false }: RatingButtonsProps) {
   // Defensive programming
   if (!onRate) {
     console.error("onRate handler is required");
@@ -34,10 +30,8 @@ export default function RatingButtons({
 
   return (
     <div className="space-y-3">
-      <p className="text-center text-sm text-muted-foreground font-medium">
-        Jak dobrze pamiętasz tę fiszkę?
-      </p>
-      
+      <p className="text-center text-sm text-muted-foreground font-medium">Jak dobrze pamiętasz tę fiszkę?</p>
+
       {/* Rating buttons grid - 2x2 layout on mobile, 4 columns on desktop */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {/* Again - Red/Destructive */}
@@ -48,11 +42,7 @@ export default function RatingButtons({
           disabled={isDisabled}
           className="flex flex-col gap-2 h-auto py-4 touch-target"
         >
-          {isSubmitting ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <RotateCcw className="w-5 h-5" />
-          )}
+          {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <RotateCcw className="w-5 h-5" />}
           <span className="text-sm font-semibold">Powtórz</span>
         </Button>
 
@@ -64,11 +54,7 @@ export default function RatingButtons({
           disabled={isDisabled}
           className="flex flex-col gap-2 h-auto py-4 bg-orange-500 hover:bg-orange-600 text-white touch-target"
         >
-          {isSubmitting ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <AlertCircle className="w-5 h-5" />
-          )}
+          {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <AlertCircle className="w-5 h-5" />}
           <span className="text-sm font-semibold">Trudne</span>
         </Button>
 
@@ -80,11 +66,7 @@ export default function RatingButtons({
           disabled={isDisabled}
           className="flex flex-col gap-2 h-auto py-4 bg-green-600 hover:bg-green-700 text-white touch-target"
         >
-          {isSubmitting ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <CheckCircle className="w-5 h-5" />
-          )}
+          {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
           <span className="text-sm font-semibold">Dobre</span>
         </Button>
 
@@ -96,15 +78,10 @@ export default function RatingButtons({
           disabled={isDisabled}
           className="flex flex-col gap-2 h-auto py-4 bg-blue-600 hover:bg-blue-700 text-white touch-target"
         >
-          {isSubmitting ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <Sparkles className="w-5 h-5" />
-          )}
+          {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
           <span className="text-sm font-semibold">Łatwe</span>
         </Button>
       </div>
     </div>
   );
 }
-

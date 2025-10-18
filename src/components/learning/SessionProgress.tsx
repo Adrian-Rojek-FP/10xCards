@@ -9,12 +9,7 @@ interface SessionProgressProps {
   reviewCards: number;
 }
 
-export default function SessionProgress({
-  currentCard,
-  totalCards,
-  newCards,
-  reviewCards,
-}: SessionProgressProps) {
+export default function SessionProgress({ currentCard, totalCards, newCards, reviewCards }: SessionProgressProps) {
   // Validate props
   if (currentCard < 1 || totalCards < 1 || currentCard > totalCards) {
     console.warn("Invalid SessionProgress props", { currentCard, totalCards });
@@ -52,4 +47,3 @@ export default function SessionProgress({
     </div>
   );
 }
-

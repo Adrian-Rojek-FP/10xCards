@@ -58,9 +58,7 @@ export const POST: APIRoute = async ({ locals }) => {
   } catch (error) {
     console.error("Error in POST /api/learning/reset:", error);
 
-    const errorMessage = error instanceof Error 
-      ? error.message 
-      : "An error occurred while resetting learning progress";
+    const errorMessage = error instanceof Error ? error.message : "An error occurred while resetting learning progress";
 
     return new Response(
       JSON.stringify({
@@ -74,4 +72,3 @@ export const POST: APIRoute = async ({ locals }) => {
     );
   }
 };
-

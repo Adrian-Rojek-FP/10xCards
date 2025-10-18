@@ -7,12 +7,10 @@ import { z } from "zod";
 export const learningSessionQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).catch(20),
   status: z.enum(["new", "learning", "review", "relearning"]).nullable().optional(),
-  include_new: z
-    .union([z.literal("true"), z.literal("false"), z.literal(null)])
-    .transform((val) => {
-      if (val === null) return true; // Default to true when not provided
-      return val === "true"; // Convert string "true"/"false" to boolean
-    }),
+  include_new: z.union([z.literal("true"), z.literal("false"), z.literal(null)]).transform((val) => {
+    if (val === null) return true; // Default to true when not provided
+    return val === "true"; // Convert string "true"/"false" to boolean
+  }),
 });
 
 /**

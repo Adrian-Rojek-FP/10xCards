@@ -27,16 +27,12 @@ export default function SessionComplete({
         {/* Congratulations card */}
         <Card className="w-full shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-700">
           <CardHeader>
-            <CardTitle className="text-3xl text-center">
-              Gratulacje! 🎉
-            </CardTitle>
+            <CardTitle className="text-3xl text-center">Gratulacje! 🎉</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Summary */}
             <div className="text-center space-y-2">
-              <p className="text-xl text-muted-foreground">
-                Ukończyłeś sesję nauki!
-              </p>
+              <p className="text-xl text-muted-foreground">Ukończyłeś sesję nauki!</p>
               <p className="text-2xl font-bold">
                 Przejrzałeś{" "}
                 <span className="text-primary">
@@ -48,11 +44,7 @@ export default function SessionComplete({
             {/* Action buttons */}
             <div className="flex flex-col gap-3 pt-4">
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  size="lg"
-                  onClick={onRestartSession}
-                  className="flex-1 gap-2"
-                >
+                <Button size="lg" onClick={onRestartSession} className="flex-1 gap-2">
                   <RefreshCw className="w-5 h-5" />
                   Rozpocznij nową sesję
                 </Button>
@@ -66,7 +58,7 @@ export default function SessionComplete({
                   Wróć do fiszek
                 </Button>
               </div>
-              
+
               {/* Reset progress button */}
               <div className="border-t pt-3 mt-2 flex flex-col items-center">
                 <Button
@@ -76,8 +68,8 @@ export default function SessionComplete({
                   disabled={isResetting}
                   className="gap-2"
                 >
-                  <RotateCcw className={`w-5 h-5 ${isResetting ? 'animate-spin' : ''}`} />
-                  {isResetting ? 'Resetowanie...' : 'Zresetuj postępy i rozpocznij od początku'}
+                  <RotateCcw className={`w-5 h-5 ${isResetting ? "animate-spin" : ""}`} />
+                  {isResetting ? "Resetowanie..." : "Zresetuj postępy i rozpocznij od początku"}
                 </Button>
                 <p className="text-sm text-muted-foreground text-center mt-2">
                   Przywróć wszystkie fiszki do stanu początkowego
@@ -100,11 +92,10 @@ export default function SessionComplete({
 
         {/* Motivational message */}
         <p className="text-center text-muted-foreground max-w-md">
-          Świetna robota! Regularne powtórki są kluczem do długotrwałego zapamiętywania.
-          Wróć jutro, aby kontynuować naukę.
+          Świetna robota! Regularne powtórki są kluczem do długotrwałego zapamiętywania. Wróć jutro, aby kontynuować
+          naukę.
         </p>
       </div>
     </div>
   );
 }
-

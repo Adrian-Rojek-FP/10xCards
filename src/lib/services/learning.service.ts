@@ -32,11 +32,7 @@ export async function getLearningSession(
 
   // Build query for learning_state with flashcards
   // Note: We query flashcards separately and join manually to avoid RLS issues with nested queries
-  let query = supabase
-    .from("learning_state")
-    .select("*")
-    .eq("user_id", userId)
-    .lte("next_review_date", now);
+  let query = supabase.from("learning_state").select("*").eq("user_id", userId).lte("next_review_date", now);
 
   // Apply status filter if provided
   if (params.status) {
@@ -100,9 +96,7 @@ export async function getLearningSession(
   }
 
   // Create a map for quick lookup
-  const flashcardsMap = new Map(
-    flashcardsData?.map((fc) => [fc.id, fc]) || []
-  );
+  const flashcardsMap = new Map(flashcardsData?.map((fc) => [fc.id, fc]) || []);
 
   // Get total counts for stats
   const { count: totalDue } = await supabase
@@ -411,7 +405,7 @@ export async function resetLearningProgress(
     .from("learning_state")
     .update({
       status: "new",
-      easiness_factor: 2.50,
+      easiness_factor: 2.5,
       interval: 0,
       repetitions: 0,
       lapses: 0,
