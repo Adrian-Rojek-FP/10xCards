@@ -5,7 +5,16 @@ const PROTECTED_PATHS = ["/generate"];
 const PUBLIC_ONLY_PATHS = ["/login", "/register", "/password-reset"];
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  const { url, cookies, request, redirect } = context;
+  const { url, cookies, request, redirect, locals } = context;
+
+  // Access runtime environment variables from Cloudflare
+  const runtime = locals.runtime as { env?: { SUPABASE_URL?: string; SUPABASE_KEY?: string } } | undefined;
+  const supabaseUrl = runtime?.env?.SUPABASE_URL || import.meta.env.SUPABASE_URL;
+  const supabaseKey = runtime?.env?.SUPABASE_KEY || import.meta.env.SUPABASE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("SUPABASE_URL and SUPABASE_KEY must be defined");
+  }
 
   // Create a Supabase client for the server
   const supabase = createSupabaseServerClient(
@@ -13,8 +22,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
       headers: request.headers,
       cookies,
     },
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_KEY
+    supabaseUrl,
+    supabaseKey
   );
   context.locals.supabase = supabase;
 

@@ -9,6 +9,13 @@ declare global {
       supabase: SupabaseClient<Database>;
       session: Session | null;
       user: User | null;
+      runtime?: {
+        env?: {
+          SUPABASE_URL?: string;
+          SUPABASE_KEY?: string;
+          OPENROUTER_API_KEY?: string;
+        };
+      };
     }
   }
 }

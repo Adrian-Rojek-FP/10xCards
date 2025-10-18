@@ -4,6 +4,7 @@
 
 1. **Incorrect Adapter**: Changed from `@astrojs/node` to `@astrojs/cloudflare`
 2. **Build Configuration**: Updated `astro.config.mjs` to use Cloudflare adapter
+3. **Runtime Environment Variables**: Fixed server-side code to access environment variables from Cloudflare's runtime context instead of build-time `import.meta.env`
 
 ## 🚀 Deployment Steps
 

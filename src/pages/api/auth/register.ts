@@ -4,7 +4,7 @@ import { AuthApiError } from "@supabase/supabase-js";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies, locals }) => {
   const { email, password } = await request.json();
 
   if (!email || !password) {
@@ -15,11 +15,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return new Response(JSON.stringify({ error: "Hasło musi mieć co najmniej 6 znaków" }), { status: 400 });
   }
 
-  const supabase = createSupabaseServerClient(
-    { cookies, headers: request.headers },
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_KEY
-  );
+  // Access runtime environment variables from Cloudflare
+  const runtime = locals.runtime as { env?: { SUPABASE_URL?: string; SUPABASE_KEY?: string } } | undefined;
+  const supabaseUrl = runtime?.env?.SUPABASE_URL || import.meta.env.SUPABASE_URL;
+  const supabaseKey = runtime?.env?.SUPABASE_KEY || import.meta.env.SUPABASE_KEY;
+
+  const supabase = createSupabaseServerClient({ cookies, headers: request.headers }, supabaseUrl, supabaseKey);
 
   const { data, error } = await supabase.auth.signUp({
     email,
