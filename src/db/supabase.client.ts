@@ -49,7 +49,7 @@ let supabaseBrowserClient: SupabaseClientType<Database> | null = null;
 export function getSupabaseBrowserClient() {
   // Don't cache - always create fresh client to pick up new cookies
   // This is especially important after PKCE redirect when cookies are just set
-  
+
   // IMPORTANT: Configure browser client to use cookies (same as server)
   // Without this, browser client uses localStorage which doesn't have the session!
   supabaseBrowserClient = createBrowserClient<Database>(

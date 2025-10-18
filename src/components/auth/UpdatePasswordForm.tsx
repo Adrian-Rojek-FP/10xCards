@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getSupabaseBrowserClient } from "@/db/supabase.client";
 
 export function UpdatePasswordForm() {
   const [password, setPassword] = React.useState("");
@@ -9,111 +8,14 @@ export function UpdatePasswordForm() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isCheckingSession, setIsCheckingSession] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
-  const [hasValidSession, setHasValidSession] = React.useState(false);
-
-  // Check for valid session when component mounts
-  // Note: PKCE code exchange happens server-side now, so we just check for existing session
-  React.useEffect(() => {
-    const supabase = getSupabaseBrowserClient();
-
-    // Debug: Check URL and cookies
-    if (typeof window !== "undefined") {
-      // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug - Client] URL Hash:", window.location.hash);
-      // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug - Client] URL Search:", window.location.search);
-      // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug - Client] All cookies:", document.cookie);
-      // Check for Supabase-specific cookies
-      const hasAuthCookies = document.cookie.includes("sb-") || document.cookie.includes("supabase");
-      // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug - Client] Has Supabase cookies:", hasAuthCookies);
-    }
-
-    // Listen for auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug - Client] Auth event:", event, "Session:", !!session);
-
-      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
-        setHasValidSession(true);
-        setIsCheckingSession(false);
-      }
-    });
-
-    // Check for existing session (should be set by server-side PKCE exchange)
-    const checkSession = async () => {
-      // Give some time for auth state to settle
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      // Try to refresh session first - this ensures browser picks up server-set cookies
-      // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug - Client] Attempting to refresh session...");
-      
-      const {
-        data: { session: refreshedSession },
-        error: refreshError,
-      } = await supabase.auth.refreshSession();
-
-      // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug - Client] Refresh session result:", {
-        hasSession: !!refreshedSession,
-        error: refreshError?.message,
-      });
-
-      if (refreshedSession) {
-        setHasValidSession(true);
-        setIsCheckingSession(false);
-        return;
-      }
-
-      // If refresh didn't work, try getSession
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug - Client] Get session result:", {
-        hasSession: !!session,
-        error: sessionError?.message,
-      });
-
-      if (session) {
-        setHasValidSession(true);
-      } else {
-        // No session found - show error
-        setError(
-          "Link resetowania hasła jest nieprawidłowy lub wygasł. Linki resetowania są ważne przez 1 godzinę i mogą być użyte tylko raz."
-        );
-        setHasValidSession(false);
-      }
-      setIsCheckingSession(false);
-    };
-
-    checkSession();
-
-    // Cleanup subscription on unmount
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
 
   // Client-side validation
   const isPasswordValid = password.length === 0 || password.length >= 6;
   const passwordsMatch = confirmPassword.length === 0 || password === confirmPassword;
   const canSubmit =
-    password.length >= 6 &&
-    confirmPassword.length >= 6 &&
-    isPasswordValid &&
-    passwordsMatch &&
-    !isLoading &&
-    hasValidSession;
+    password.length >= 6 && confirmPassword.length >= 6 && isPasswordValid && passwordsMatch && !isLoading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,62 +52,6 @@ export function UpdatePasswordForm() {
       setIsLoading(false);
     }
   };
-
-  // Show loading state while checking session
-  if (isCheckingSession) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-4 py-8">
-        <svg className="animate-spin size-8 text-primary" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
-        <p className="text-sm text-muted-foreground">Weryfikacja linku resetowania...</p>
-      </div>
-    );
-  }
-
-  // Show error with link to request new reset if session is invalid
-  if (!hasValidSession && error) {
-    return (
-      <div className="space-y-6">
-        <div
-          className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive"
-          role="alert"
-          aria-live="polite"
-        >
-          <div className="flex items-start gap-3">
-            <svg
-              className="size-5 shrink-0 mt-0.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-              />
-            </svg>
-            <p>{error}</p>
-          </div>
-        </div>
-        <div className="text-center">
-          <a
-            href="/password-reset"
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4"
-          >
-            Poproś o nowy link
-          </a>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
