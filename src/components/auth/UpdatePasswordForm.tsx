@@ -15,81 +15,35 @@ export function UpdatePasswordForm() {
   const [hasValidSession, setHasValidSession] = React.useState(false);
 
   // Check for valid session when component mounts
+  // Note: PKCE code exchange happens server-side now, so we just check for existing session
   React.useEffect(() => {
     const supabase = getSupabaseBrowserClient();
 
-    // Debug: Check URL for tokens/code
+    // Debug: Check URL
     if (typeof window !== "undefined") {
       // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug] URL Hash:", window.location.hash);
+      console.log("[Password Reset Debug - Client] URL Hash:", window.location.hash);
       // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug] URL Search:", window.location.search);
+      console.log("[Password Reset Debug - Client] URL Search:", window.location.search);
     }
 
-    // Listen for auth state changes (triggered when tokens are exchanged)
+    // Listen for auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug] Auth event:", event, "Session:", !!session);
+      console.log("[Password Reset Debug - Client] Auth event:", event, "Session:", !!session);
 
-      if (event === "PASSWORD_RECOVERY") {
-        // Password recovery session established
-        setHasValidSession(true);
-        setIsCheckingSession(false);
-      } else if (event === "SIGNED_IN" && session) {
-        // Also handle general sign-in event
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
         setHasValidSession(true);
         setIsCheckingSession(false);
       }
     });
 
-    // Handle PKCE flow - check for code in URL and exchange it
-    const handlePKCEFlow = async () => {
-      // Check if we have a code parameter (PKCE flow)
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get("code");
-
-      // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug] PKCE code found:", !!code);
-
-      if (code) {
-        try {
-          // Exchange the code for a session
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-
-          // eslint-disable-next-line no-console
-          console.log("[Password Reset Debug] Code exchange result:", {
-            hasSession: !!data.session,
-            error: error?.message,
-          });
-
-          if (error) {
-            setError(
-              "Link resetowania hasła jest nieprawidłowy lub wygasł. Linki resetowania są ważne przez 1 godzinę i mogą być użyte tylko raz."
-            );
-            setHasValidSession(false);
-            setIsCheckingSession(false);
-            return;
-          }
-
-          if (data.session) {
-            setHasValidSession(true);
-            setIsCheckingSession(false);
-            return;
-          }
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.error("[Password Reset Debug] Code exchange error:", err);
-          setError("Wystąpił błąd podczas weryfikacji linku resetowania.");
-          setHasValidSession(false);
-          setIsCheckingSession(false);
-          return;
-        }
-      }
-
-      // If no code, check for existing session (hash-based flow)
-      await new Promise((resolve) => setTimeout(resolve, 500));
+    // Check for existing session (should be set by server-side PKCE exchange)
+    const checkSession = async () => {
+      // Give some time for auth state to settle
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       const {
         data: { session },
@@ -97,7 +51,7 @@ export function UpdatePasswordForm() {
       } = await supabase.auth.getSession();
 
       // eslint-disable-next-line no-console
-      console.log("[Password Reset Debug] Session check result:", {
+      console.log("[Password Reset Debug - Client] Session check result:", {
         hasSession: !!session,
         error: sessionError?.message,
       });
@@ -114,8 +68,7 @@ export function UpdatePasswordForm() {
       setIsCheckingSession(false);
     };
 
-    // Start the PKCE flow handler
-    handlePKCEFlow();
+    checkSession();
 
     // Cleanup subscription on unmount
     return () => {
