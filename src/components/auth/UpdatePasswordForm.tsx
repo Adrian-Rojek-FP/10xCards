@@ -16,35 +16,72 @@ export function UpdatePasswordForm() {
 
   // Check for valid session when component mounts
   React.useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const supabase = getSupabaseBrowserClient();
+    const supabase = getSupabaseBrowserClient();
 
-        // Wait a bit for Supabase to process tokens from URL hash
-        await new Promise((resolve) => setTimeout(resolve, 100));
+    // Debug: Check URL for tokens
+    if (typeof window !== "undefined") {
+      // eslint-disable-next-line no-console
+      console.log("[Password Reset Debug] URL Hash:", window.location.hash);
+      // eslint-disable-next-line no-console
+      console.log("[Password Reset Debug] URL Search:", window.location.search);
+    }
 
-        const {
-          data: { session },
-          error: sessionError,
-        } = await supabase.auth.getSession();
+    // Listen for auth state changes (triggered when tokens are exchanged)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // eslint-disable-next-line no-console
+      console.log("[Password Reset Debug] Auth event:", event, "Session:", !!session);
 
-        if (sessionError || !session) {
-          setError(
-            "Link resetowania hasła jest nieprawidłowy lub wygasł. Linki resetowania są ważne przez 1 godzinę i mogą być użyte tylko raz."
-          );
-          setHasValidSession(false);
-        } else {
-          setHasValidSession(true);
-        }
-      } catch {
-        setError("Wystąpił błąd podczas weryfikacji sesji. Spróbuj ponownie.");
-        setHasValidSession(false);
-      } finally {
+      if (event === "PASSWORD_RECOVERY") {
+        // Password recovery session established
+        setHasValidSession(true);
+        setIsCheckingSession(false);
+      } else if (event === "SIGNED_IN" && session) {
+        // Also handle general sign-in event
+        setHasValidSession(true);
         setIsCheckingSession(false);
       }
+    });
+
+    // Also check immediately in case session already exists
+    const checkSession = async () => {
+      // Give Supabase time to process URL hash and trigger auth state change
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      // eslint-disable-next-line no-console
+      console.log("[Password Reset Debug] Session check result:", {
+        hasSession: !!session,
+        error: sessionError?.message,
+      });
+
+      if (session) {
+        setHasValidSession(true);
+      } else {
+        // No session found - show error
+        setError(
+          "Link resetowania hasła jest nieprawidłowy lub wygasł. Linki resetowania są ważne przez 1 godzinę i mogą być użyte tylko raz."
+        );
+        setHasValidSession(false);
+      }
+      setIsCheckingSession(false);
     };
 
-    checkSession();
+    // Set a timeout to check session if auth state change doesn't fire
+    const timeoutId = setTimeout(() => {
+      checkSession();
+    }, 100);
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   // Client-side validation
