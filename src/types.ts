@@ -303,3 +303,12 @@ export interface ReviewHistoryQueryParams {
   from_date?: string; // ISO 8601
   to_date?: string; // ISO 8601
 }
+
+// ------------------------------------------------------------------------------------------------
+// 23. Reset Learning Progress Response DTO
+//     Response from POST /learning/reset endpoint
+// ------------------------------------------------------------------------------------------------
+export interface ResetLearningProgressResponseDto {
+  message: string;
+  reset_count: number;
+}

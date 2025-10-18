@@ -7,6 +7,7 @@ import type {
   ReviewResponseDto,
   RatingValue,
   LearningSessionQueryParams,
+  ResetLearningProgressResponseDto,
 } from "@/types";
 
 interface UseLearningSessionReturn {
@@ -19,12 +20,14 @@ interface UseLearningSessionReturn {
   isLoading: boolean;
   error: string | null;
   isSessionComplete: boolean;
+  isResetting: boolean;
 
   // Actions
   fetchSession: (params?: LearningSessionQueryParams) => Promise<void>;
   revealCard: () => void;
   submitRating: (rating: RatingValue) => Promise<void>;
   restartSession: () => Promise<void>;
+  resetProgress: () => Promise<void>;
 }
 
 export function useLearningSession(): UseLearningSessionReturn {
@@ -36,6 +39,7 @@ export function useLearningSession(): UseLearningSessionReturn {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [cardStartTime, setCardStartTime] = useState<number>(Date.now());
+  const [isResetting, setIsResetting] = useState<boolean>(false);
 
   // Derived state
   const currentCard = session?.flashcards[currentCardIndex] ?? null;
@@ -174,6 +178,41 @@ export function useLearningSession(): UseLearningSessionReturn {
     await fetchSession();
   }, [fetchSession]);
 
+  /**
+   * Reset all learning progress - restore all flashcards to initial state
+   */
+  const resetProgress = useCallback(async () => {
+    setIsResetting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/learning/reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+
+        throw new Error("Nie udało się zresetować postępów");
+      }
+
+      const result: ResetLearningProgressResponseDto = await response.json();
+      
+      // After successful reset, fetch new session with all cards
+      await fetchSession();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Wystąpił błąd");
+    } finally {
+      setIsResetting(false);
+    }
+  }, [fetchSession]);
+
   // Initialize session on mount
   useEffect(() => {
     fetchSession();
@@ -188,10 +227,12 @@ export function useLearningSession(): UseLearningSessionReturn {
     isLoading,
     error,
     isSessionComplete,
+    isResetting,
     fetchSession,
     revealCard,
     submitRating,
     restartSession,
+    resetProgress,
   };
 }
 

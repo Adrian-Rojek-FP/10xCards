@@ -394,3 +394,37 @@ export async function getReviewHistory(
     },
   };
 }
+
+/**
+ * Reset all learning progress for user - restores all flashcards to initial state
+ *
+ * @param supabase - Supabase client instance
+ * @param userId - Authenticated user ID
+ * @returns Number of learning states reset
+ */
+export async function resetLearningProgress(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<{ reset_count: number }> {
+  // Update all learning_state records for this user to initial values
+  const { count, error } = await supabase
+    .from("learning_state")
+    .update({
+      status: "new",
+      easiness_factor: 2.50,
+      interval: 0,
+      repetitions: 0,
+      lapses: 0,
+      next_review_date: new Date().toISOString(),
+    })
+    .eq("user_id", userId)
+    .select("*", { count: "exact", head: true });
+
+  if (error) {
+    throw new Error(`Failed to reset learning progress: ${error.message}`);
+  }
+
+  return {
+    reset_count: count || 0,
+  };
+}

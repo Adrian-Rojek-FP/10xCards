@@ -2,7 +2,7 @@
 import { useLearningSession } from "@/components/hooks/useLearningSession";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, RefreshCw } from "lucide-react";
 import SessionProgress from "./SessionProgress";
 import FlashcardDisplay from "./FlashcardDisplay";
 import RatingButtons from "./RatingButtons";
@@ -18,9 +18,11 @@ export default function LearningSession() {
     isLoading,
     error,
     isSessionComplete,
+    isResetting,
     revealCard,
     submitRating,
     restartSession,
+    resetProgress,
   } = useLearningSession();
 
   // Loading state
@@ -55,7 +57,7 @@ export default function LearningSession() {
   if (!session || session.flashcards.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 max-w-2xl w-full">
           <div className="text-6xl mb-4">✅</div>
           <h2 className="text-3xl font-bold">Świetna robota!</h2>
           <p className="text-muted-foreground text-lg">
@@ -65,13 +67,32 @@ export default function LearningSession() {
             Twoje fiszki zostały zaplanowane zgodnie z algorytmem powtórek rozłożonych w czasie.<br />
             Wróć później, aby kontynuować naukę, lub dodaj nowe fiszki.
           </p>
-          <div className="flex gap-2 justify-center mt-6">
-            <Button onClick={() => (window.location.href = "/flashcards")}>
-              Moje fiszki
-            </Button>
-            <Button variant="outline" onClick={() => (window.location.href = "/generate")}>
-              Generuj z AI
-            </Button>
+          <div className="flex flex-col gap-3 mt-6">
+            <div className="flex gap-2 justify-center">
+              <Button onClick={() => (window.location.href = "/flashcards")}>
+                Moje fiszki
+              </Button>
+              <Button variant="outline" onClick={() => (window.location.href = "/generate")}>
+                Generuj z AI
+              </Button>
+            </div>
+            
+            {/* Reset progress button */}
+            <div className="border-t pt-4 mt-4 flex flex-col items-center">
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={resetProgress}
+                disabled={isResetting}
+                className="gap-2"
+              >
+                <RefreshCw className={`w-5 h-5 ${isResetting ? 'animate-spin' : ''}`} />
+                {isResetting ? 'Resetowanie...' : 'Zresetuj wszystkie postępy'}
+              </Button>
+              <p className="text-sm text-muted-foreground text-center mt-2">
+                Przywróć wszystkie fiszki do stanu początkowego i rozpocznij od nowa
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -84,6 +105,8 @@ export default function LearningSession() {
       <SessionComplete
         totalReviewed={session.flashcards.length}
         onRestartSession={restartSession}
+        onResetProgress={resetProgress}
+        isResetting={isResetting}
       />
     );
   }
