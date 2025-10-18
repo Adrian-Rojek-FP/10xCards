@@ -11,7 +11,6 @@ import type {
   ReviewHistoryQueryParams,
 } from "../../types";
 import { calculateSM2 } from "./sm2.service";
-import { randomUUID } from "node:crypto";
 
 /**
  * Get flashcards due for review (learning session)
@@ -73,7 +72,7 @@ export async function getLearningSession(
       .lte("next_review_date", new Date().toISOString());
 
     return {
-      session_id: randomUUID(),
+      session_id: crypto.randomUUID(),
       flashcards: [],
       total_due: totalDue || 0,
       new_cards: newCards || 0,
@@ -141,7 +140,7 @@ export async function getLearningSession(
     .filter((item): item is FlashcardWithLearningStateDto => item !== null);
 
   return {
-    session_id: randomUUID(),
+    session_id: crypto.randomUUID(),
     flashcards,
     total_due: totalDue || 0,
     new_cards: newCards || 0,
