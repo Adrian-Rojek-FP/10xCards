@@ -4,10 +4,8 @@ import type {
   LearningSessionResponseDto,
   FlashcardWithLearningStateDto,
   ReviewSubmitCommand,
-  ReviewResponseDto,
   RatingValue,
   LearningSessionQueryParams,
-  ResetLearningProgressResponseDto,
 } from "@/types";
 
 interface UseLearningSessionReturn {
@@ -119,7 +117,7 @@ export function useLearningSession(): UseLearningSessionReturn {
 
       // Validate rating value
       if (rating < 0 || rating > 3) {
-        console.error("Invalid rating value");
+        setError("Nieprawidłowa wartość oceny");
         return;
       }
 

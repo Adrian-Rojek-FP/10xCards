@@ -60,34 +60,25 @@ export default function LearningSession() {
         <div className="text-center space-y-4 max-w-2xl w-full">
           <div className="text-6xl mb-4">✅</div>
           <h2 className="text-3xl font-bold">Świetna robota!</h2>
-          <p className="text-muted-foreground text-lg">
-            Wszystkie fiszki są aktualne. 
-          </p>
+          <p className="text-muted-foreground text-lg">Wszystkie fiszki są aktualne.</p>
           <p className="text-muted-foreground">
-            Twoje fiszki zostały zaplanowane zgodnie z algorytmem powtórek rozłożonych w czasie.<br />
+            Twoje fiszki zostały zaplanowane zgodnie z algorytmem powtórek rozłożonych w czasie.
+            <br />
             Wróć później, aby kontynuować naukę, lub dodaj nowe fiszki.
           </p>
           <div className="flex flex-col gap-3 mt-6">
             <div className="flex gap-2 justify-center">
-              <Button onClick={() => (window.location.href = "/flashcards")}>
-                Moje fiszki
-              </Button>
+              <Button onClick={() => (window.location.href = "/flashcards")}>Moje fiszki</Button>
               <Button variant="outline" onClick={() => (window.location.href = "/generate")}>
                 Generuj z AI
               </Button>
             </div>
-            
+
             {/* Reset progress button */}
             <div className="border-t pt-4 mt-4 flex flex-col items-center">
-              <Button
-                size="lg"
-                variant="secondary"
-                onClick={resetProgress}
-                disabled={isResetting}
-                className="gap-2"
-              >
-                <RefreshCw className={`w-5 h-5 ${isResetting ? 'animate-spin' : ''}`} />
-                {isResetting ? 'Resetowanie...' : 'Zresetuj wszystkie postępy'}
+              <Button size="lg" variant="secondary" onClick={resetProgress} disabled={isResetting} className="gap-2">
+                <RefreshCw className={`w-5 h-5 ${isResetting ? "animate-spin" : ""}`} />
+                {isResetting ? "Resetowanie..." : "Zresetuj wszystkie postępy"}
               </Button>
               <p className="text-sm text-muted-foreground text-center mt-2">
                 Przywróć wszystkie fiszki do stanu początkowego i rozpocznij od nowa
@@ -137,11 +128,7 @@ export default function LearningSession() {
 
       {/* Flashcard Display */}
       <div className="mt-8">
-        <FlashcardDisplay
-          flashcard={currentCard}
-          isRevealed={isCardRevealed}
-          onReveal={revealCard}
-        />
+        <FlashcardDisplay flashcard={currentCard} isRevealed={isCardRevealed} onReveal={revealCard} />
       </div>
 
       {/* Rating Buttons - only visible after reveal */}
@@ -153,4 +140,3 @@ export default function LearningSession() {
     </div>
   );
 }
-

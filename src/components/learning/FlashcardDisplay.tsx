@@ -10,11 +10,7 @@ interface FlashcardDisplayProps {
   onReveal: () => void;
 }
 
-export default function FlashcardDisplay({
-  flashcard,
-  isRevealed,
-  onReveal,
-}: FlashcardDisplayProps) {
+export default function FlashcardDisplay({ flashcard, isRevealed, onReveal }: FlashcardDisplayProps) {
   // Defensive programming - validate flashcard
   if (!flashcard || !flashcard.front || !flashcard.back) {
     console.error("Invalid flashcard data", flashcard);
@@ -38,9 +34,7 @@ export default function FlashcardDisplay({
         <CardContent className="space-y-6">
           {/* Front of the card - always visible */}
           <div className="min-h-[120px] flex items-center justify-center">
-            <p className="text-2xl md:text-3xl text-center font-medium leading-relaxed">
-              {flashcard.front}
-            </p>
+            <p className="text-2xl md:text-3xl text-center font-medium leading-relaxed">{flashcard.front}</p>
           </div>
 
           {/* Back of the card - visible after reveal with animation */}
@@ -51,9 +45,7 @@ export default function FlashcardDisplay({
               aria-label="Odpowiedź"
             >
               <div className="min-h-[120px] flex items-center justify-center bg-muted/30 rounded-lg p-6">
-                <p className="text-xl md:text-2xl text-center leading-relaxed">
-                  {flashcard.back}
-                </p>
+                <p className="text-xl md:text-2xl text-center leading-relaxed">{flashcard.back}</p>
               </div>
             </div>
           )}
@@ -61,11 +53,7 @@ export default function FlashcardDisplay({
           {/* Show answer button - only visible before reveal */}
           {!isRevealed && (
             <div className="flex justify-center pt-4">
-              <Button
-                size="lg"
-                onClick={onReveal}
-                className="min-w-[200px] gap-2"
-              >
+              <Button size="lg" onClick={onReveal} className="min-w-[200px] gap-2">
                 <Eye className="w-5 h-5" />
                 Pokaż odpowiedź
               </Button>
@@ -76,4 +64,3 @@ export default function FlashcardDisplay({
     </div>
   );
 }
-
