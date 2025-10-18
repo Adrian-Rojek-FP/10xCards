@@ -1,4 +1,16 @@
+# ⚠️ DOKUMENT PRZESTARZAŁY
+
+> **Status**: PRZESTARZAŁY - Nie używać  
+> **Data oznaczenia**: 2025-10-18  
+> **Przyczyna**: Endpoint został już zaimplementowany w `src/pages/api/flashcards.ts`
+>
+> **Aktualny plan**: Zobacz `flashcards-api-implementation-plan.md` dla kompletnego planu CRUD
+>
+> ---
+
 # API Endpoint Implementation Plan: POST /flashcards
+
+**✅ STATUS**: ZAIMPLEMENTOWANE w `src/pages/api/flashcards.ts` (linie 87-193)
 
 ## 1. Przegląd punktu końcowego
 Endpoint POST /flashcards służy do tworzenia jednego lub wielu flashcards. Umożliwia zapisywanie fiszek zarówno tworzonych ręcznie, jak i generowanych przez AI, zapewniając przy tym ścisłą walidację danych wejściowych oraz odpowiednie powiązanie z rekordem generacji (jeśli dotyczy).
