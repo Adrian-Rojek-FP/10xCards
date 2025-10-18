@@ -20,15 +20,23 @@ vi.mock("../../src/lib/services/openrouter.service", () => ({
   })),
 }));
 
-// Mock crypto module for hash calculation
-vi.mock("crypto", () => ({
-  default: {
-    createHash: vi.fn(() => ({
-      update: vi.fn().mockReturnThis(),
-      digest: vi.fn(() => "mocked-hash-value"),
-    })),
+// Mock Web Crypto API for hash calculation
+// The mock returns a predictable hash
+const expectedMockedHash = "00070e151c232a31383f464d545b626970777e858c939aa1a8afb6bdc4cbd2d9";
+
+vi.stubGlobal("crypto", {
+  subtle: {
+    digest: vi.fn().mockImplementation(async () => {
+      // Return a buffer that will be converted to a predictable hex string
+      const buffer = new Uint8Array(32);
+      // Fill with pattern that produces a consistent hex string
+      for (let i = 0; i < 32; i++) {
+        buffer[i] = i * 7;
+      }
+      return buffer.buffer;
+    }),
   },
-}));
+});
 
 describe("generation.service", () => {
   let mockSupabase: SupabaseClient;
@@ -102,7 +110,7 @@ describe("generation.service", () => {
         user_id: userId,
         model: "openai/gpt-4o-mini",
         generated_count: 2,
-        source_text_hash: "mocked-hash-value",
+        source_text_hash: expectedMockedHash,
         source_text_length: sourceText.length,
         generation_duration: expect.any(Number),
       });
@@ -247,7 +255,7 @@ describe("generation.service", () => {
         error_code: "AI_SERVICE_ERROR",
         error_message: "Failed to generate flashcards: AI service returned no response",
         model: "openai/gpt-4o-mini",
-        source_text_hash: "mocked-hash-value",
+        source_text_hash: expectedMockedHash,
         source_text_length: sourceText.length,
       });
     });
@@ -350,7 +358,7 @@ describe("generation.service", () => {
         error_code: "AI_SERVICE_ERROR",
         error_message: "Failed to generate flashcards: Network timeout",
         model: "openai/gpt-4o-mini",
-        source_text_hash: "mocked-hash-value",
+        source_text_hash: expectedMockedHash,
         source_text_length: sourceText.length,
       });
     });
@@ -521,7 +529,6 @@ describe("generation.service", () => {
   describe("generateFlashcards - Hash Calculation", () => {
     it("should calculate hash for source text", async () => {
       // Arrange
-      const crypto = await import("crypto");
       const sourceText = "Test content for hashing";
       const userId = "user-123";
 
@@ -538,9 +545,9 @@ describe("generation.service", () => {
       await generateFlashcards(sourceText, userId, mockSupabase);
 
       // Assert
-      expect(crypto.default.createHash).toHaveBeenCalledWith("sha256");
+      expect(crypto.subtle.digest).toHaveBeenCalled();
       const insertCall = mockInsert.mock.calls[0][0];
-      expect(insertCall.source_text_hash).toBe("mocked-hash-value");
+      expect(insertCall.source_text_hash).toBe(expectedMockedHash);
     });
 
     it("should calculate same hash for duplicate source text in error logging", async () => {
@@ -567,7 +574,7 @@ describe("generation.service", () => {
 
       // Assert
       const errorLogCall = mockErrorInsert.mock.calls[0][0];
-      expect(errorLogCall.source_text_hash).toBe("mocked-hash-value");
+      expect(errorLogCall.source_text_hash).toBe(expectedMockedHash);
     });
   });
 

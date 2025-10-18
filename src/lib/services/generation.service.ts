@@ -1,7 +1,7 @@
 // src/lib/services/generation.service.ts
-import type { SupabaseClient } from "../../db/supabase.client";
+import type { SupabaseClient as SupabaseClientType } from "@supabase/supabase-js";
+import type { Database } from "../../db/database.types";
 import type { GenerationCreateResponseDto, FlashcardProposalDto } from "../../types";
-import crypto from "crypto";
 import { createOpenRouterService, type JSONSchema } from "./openrouter.service";
 
 /**
@@ -155,10 +155,16 @@ async function aiServiceGenerateFlashcards(
 }
 
 /**
- * Calculate SHA-256 hash of the source text
+ * Calculate SHA-256 hash of the source text using Web Crypto API
+ * Compatible with Cloudflare Workers
  */
-function calculateHash(text: string): string {
-  return crypto.createHash("sha256").update(text, "utf8").digest("hex");
+async function calculateHash(text: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  return hashHex;
 }
 
 /**
@@ -174,7 +180,7 @@ function calculateHash(text: string): string {
 export async function generateFlashcards(
   sourceText: string,
   userId: string,
-  supabase: SupabaseClient,
+  supabase: SupabaseClientType<Database>,
   runtime?: { env?: { OPENROUTER_API_KEY?: string } }
 ): Promise<GenerationCreateResponseDto> {
   const startTime = Date.now();
@@ -187,7 +193,7 @@ export async function generateFlashcards(
     // Step 2: Calculate generation metadata
     const endTime = Date.now();
     const generationDuration = endTime - startTime;
-    const sourceTextHash = calculateHash(sourceText);
+    const sourceTextHash = await calculateHash(sourceText);
     const sourceTextLength = sourceText.length;
 
     // Step 3: Save generation metadata to database
@@ -218,7 +224,7 @@ export async function generateFlashcards(
     };
   } catch (error) {
     // Step 5: Log error to generation_error_logs table
-    const sourceTextHash = calculateHash(sourceText);
+    const sourceTextHash = await calculateHash(sourceText);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     const errorCode = "AI_SERVICE_ERROR"; // Could be more specific based on error type
 
