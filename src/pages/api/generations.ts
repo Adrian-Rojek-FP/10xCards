@@ -39,6 +39,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const supabase = locals.supabase;
 
+    // Get runtime context for environment variables (Cloudflare)
+    const runtime = locals.runtime as { env?: { OPENROUTER_API_KEY?: string } } | undefined;
+
     // Step 1: Parse and validate request body
     let body: unknown;
     try {
@@ -85,7 +88,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const result: GenerationCreateResponseDto = await generateFlashcards(
       command.source_text,
       DEFAULT_USER_ID,
-      supabase
+      supabase,
+      runtime // Pass runtime context for Cloudflare environment variables
     );
 
     // Step 4: Return successful response

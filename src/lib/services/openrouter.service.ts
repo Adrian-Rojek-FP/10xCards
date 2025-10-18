@@ -122,6 +122,11 @@ export interface OpenRouterServiceOptions {
   retryDelay?: number;
   logger?: LoggerCallback;
   enableMetrics?: boolean;
+  runtime?: {
+    env?: {
+      OPENROUTER_API_KEY?: string;
+    };
+  };
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -220,7 +225,9 @@ export class OpenRouterService {
    */
   constructor(options: OpenRouterServiceOptions = {}) {
     // Initialize API configuration
-    this.apiKey = options.apiKey || import.meta.env.OPENROUTER_API_KEY || "";
+    // Support runtime environment variables (Cloudflare) with fallback to build-time (local dev)
+    const runtimeApiKey = options.runtime?.env?.OPENROUTER_API_KEY;
+    this.apiKey = options.apiKey || runtimeApiKey || import.meta.env.OPENROUTER_API_KEY || "";
     this.apiUrl = options.apiUrl || "https://openrouter.ai/api/v1/chat/completions";
     this.timeout = options.timeout || 30000; // 30 seconds
     this.maxRetries = options.maxRetries || 3;

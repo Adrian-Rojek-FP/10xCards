@@ -65,14 +65,19 @@ Return your response as a JSON object with a "flashcards" array containing objec
  * Generate flashcards using OpenRouter AI service
  *
  * @param sourceText - The input text to generate flashcards from
+ * @param runtime - Optional runtime context with environment variables
  * @returns Array of generated flashcard proposals
  * @throws Error if AI service fails
  */
-async function aiServiceGenerateFlashcards(sourceText: string): Promise<FlashcardProposalDto[]> {
+async function aiServiceGenerateFlashcards(
+  sourceText: string,
+  runtime?: { env?: { OPENROUTER_API_KEY?: string } }
+): Promise<FlashcardProposalDto[]> {
   try {
     // Create OpenRouter service instance with logging
     const openRouter = createOpenRouterService({
       enableMetrics: true,
+      runtime, // Pass runtime context for Cloudflare environment variables
       logger: (level, message, data) => {
         // eslint-disable-next-line no-console
         console.log(`[OpenRouter ${level.toUpperCase()}] ${message}`, data ? JSON.stringify(data, null, 2) : "");
@@ -162,19 +167,21 @@ function calculateHash(text: string): string {
  * @param sourceText - The input text (1000-10000 characters)
  * @param userId - The authenticated user's ID
  * @param supabase - Supabase client instance
+ * @param runtime - Optional runtime context with environment variables (for Cloudflare)
  * @returns Generation response with flashcard proposals
  * @throws Error if AI service fails or database operation fails
  */
 export async function generateFlashcards(
   sourceText: string,
   userId: string,
-  supabase: SupabaseClient
+  supabase: SupabaseClient,
+  runtime?: { env?: { OPENROUTER_API_KEY?: string } }
 ): Promise<GenerationCreateResponseDto> {
   const startTime = Date.now();
 
   try {
     // Step 1: Call AI service to generate flashcard proposals
-    const flashcardsProposals = await aiServiceGenerateFlashcards(sourceText);
+    const flashcardsProposals = await aiServiceGenerateFlashcards(sourceText, runtime);
     const generatedCount = flashcardsProposals.length;
 
     // Step 2: Calculate generation metadata
