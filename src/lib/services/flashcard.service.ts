@@ -45,7 +45,7 @@ async function validateGenerationOwnership(
 export async function getFlashcards(
   supabase: SupabaseClient,
   userId: string,
-  filters: { source?: Source; generation_id?: number },
+  filters: { source?: Source | null | undefined; generation_id?: number | null | undefined },
   pagination: { page: number; limit: number },
   sorting: { sort: string; order: "asc" | "desc" }
 ): Promise<FlashcardsListResponseDto> {
@@ -59,7 +59,7 @@ export async function getFlashcards(
   if (filters.source) {
     query = query.eq("source", filters.source);
   }
-  if (filters.generation_id !== undefined) {
+  if (filters.generation_id !== undefined && filters.generation_id !== null) {
     query = query.eq("generation_id", filters.generation_id);
   }
 
@@ -74,7 +74,8 @@ export async function getFlashcards(
   const { data, error, count } = await query;
 
   if (error) {
-    throw new Error("Failed to fetch flashcards");
+    console.error("Supabase error in getFlashcards:", error);
+    throw new Error(`Failed to fetch flashcards: ${error.message}`);
   }
 
   // Return paginated response

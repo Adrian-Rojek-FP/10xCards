@@ -21,6 +21,9 @@ export function Header({ user }: HeaderProps) {
             <a href="/generate" className="transition-colors hover:text-foreground/80 text-foreground/60">
               Generuj fiszki
             </a>
+            <a href="/flashcards" className="transition-colors hover:text-foreground/80 text-foreground/60">
+              Moje fiszki
+            </a>
           </nav>
         </div>
         <div className="flex items-center gap-4">

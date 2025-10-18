@@ -1,0 +1,12 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { FlashcardsView } from "@/components/flashcards/FlashcardsView";
+
+// Get user from context.locals (set by middleware)
+const user = Astro.locals.user;
+---
+
+<Layout title="Moje Fiszki - 10xCards">
+  <FlashcardsView client:load user={user} />
+</Layout>
+

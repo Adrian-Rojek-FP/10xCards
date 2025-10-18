@@ -130,3 +130,17 @@ export interface FlashcardProposalViewModel {
   accepted: boolean;
   edited: boolean;
 }
+
+// ------------------------------------------------------------------------------------------------
+// 12. Flashcard View Model
+//     View model for flashcards in the "My Flashcards" view.
+//     Converts database DTOs to UI-friendly format with Date objects.
+// ------------------------------------------------------------------------------------------------
+export interface FlashcardViewModel {
+  id: number;
+  front: string;
+  back: string;
+  source: "ai-full" | "ai-edited" | "manual";
+  createdAt: Date;
+  updatedAt: Date;
+}

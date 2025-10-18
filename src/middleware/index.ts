@@ -1,7 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import { createSupabaseServerClient } from "../db/supabase.client";
 
-const PROTECTED_PATHS = ["/generate"];
+const PROTECTED_PATHS = ["/generate", "/flashcards"];
 const PUBLIC_ONLY_PATHS = ["/login", "/register", "/password-reset"];
 
 export const onRequest = defineMiddleware(async (context, next) => {

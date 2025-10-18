@@ -116,10 +116,10 @@ export const flashcardIdSchema = z.coerce.number().int().positive({
  * All parameters are optional with sensible defaults
  */
 export const flashcardsQuerySchema = z.object({
-  page: z.coerce.number().int().min(1, "Page must be at least 1").default(1),
-  limit: z.coerce.number().int().min(1, "Limit must be at least 1").max(100, "Limit cannot exceed 100").default(10),
-  sort: z.enum(["created_at", "updated_at", "front", "back"]).default("created_at"),
-  order: z.enum(["asc", "desc"]).default("desc"),
-  source: z.enum(["ai-full", "ai-edited", "manual"]).optional(),
-  generation_id: z.coerce.number().int().positive().optional(),
+  page: z.coerce.number().int().min(1, "Page must be at least 1").catch(1),
+  limit: z.coerce.number().int().min(1, "Limit must be at least 1").max(100, "Limit cannot exceed 100").catch(10),
+  sort: z.enum(["created_at", "updated_at", "front", "back"]).catch("created_at"),
+  order: z.enum(["asc", "desc"]).catch("desc"),
+  source: z.enum(["ai-full", "ai-edited", "manual"]).nullish(),
+  generation_id: z.coerce.number().int().positive().nullish(),
 });
