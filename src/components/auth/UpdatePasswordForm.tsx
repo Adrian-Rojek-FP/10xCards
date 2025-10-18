@@ -26,19 +26,31 @@ export function UpdatePasswordForm() {
 
     setIsLoading(true);
 
-    // TODO: Implement Supabase password update
-    // This will be implemented in the next phase
+    try {
+      const response = await fetch("/api/auth/update-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password, confirmPassword }),
+      });
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setSuccessMessage("Hasło zostało pomyślnie zmienione. Za chwilę zostaniesz przekierowany...");
+      const data = await response.json();
 
-      // Simulate redirect after success
+      if (!response.ok) {
+        throw new Error(data.error || "Wystąpił nieznany błąd.");
+      }
+
+      setSuccessMessage(data.message + " Za chwilę zostaniesz przekierowany...");
+      
+      // Redirect to login after 2 seconds
       setTimeout(() => {
         window.location.href = "/login";
       }, 2000);
-    }, 1000);
+    } catch (err) {
+      setError((err as Error).message);
+      setIsLoading(false);
+    }
   };
 
   return (

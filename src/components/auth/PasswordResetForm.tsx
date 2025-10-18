@@ -21,17 +21,28 @@ export function PasswordResetForm() {
 
     setIsLoading(true);
 
-    // TODO: Implement Supabase password reset
-    // This will be implemented in the next phase
+    try {
+      const response = await fetch("/api/auth/password-reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setSuccessMessage(
-        "Jeśli podany adres e-mail jest zarejestrowany w systemie, otrzymasz instrukcje resetowania hasła."
-      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Wystąpił nieznany błąd.");
+      }
+
+      setSuccessMessage(data.message);
       setEmail("");
-    }, 1000);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
