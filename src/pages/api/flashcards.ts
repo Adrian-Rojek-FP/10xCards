@@ -3,7 +3,6 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import type { FlashcardsCreateCommand, FlashcardDto } from "../../types";
 import { createFlashcards } from "../../lib/services/flashcard.service";
-import { DEFAULT_USER_ID } from "../../db/supabase.client";
 
 // Disable prerendering for this API endpoint
 export const prerender = false;
@@ -84,12 +83,25 @@ const FlashcardsCreateCommandSchema = z.object({
  * - 400: Invalid input data (validation errors)
  * - 401: Unauthorized (user not authenticated)
  * - 500: Server error (database error)
- *
- * Note: Authentication will be added later
  */
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const supabase = locals.supabase;
+    const user = locals.user;
+
+    // Check if user is authenticated
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "You must be logged in to create flashcards",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
 
     // Step 1: Parse request body
     let body: unknown;
@@ -133,8 +145,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const command: FlashcardsCreateCommand = validationResult.data;
 
     // Step 3: Call flashcard service to create the flashcards
-    // TODO: Replace DEFAULT_USER_ID with actual authenticated user ID
-    const createdFlashcards: FlashcardDto[] = await createFlashcards(command.flashcards, DEFAULT_USER_ID, supabase);
+    const createdFlashcards: FlashcardDto[] = await createFlashcards(command.flashcards, user.id, supabase);
 
     // Step 4: Return successful response
     return new Response(

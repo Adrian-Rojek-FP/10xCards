@@ -3,7 +3,6 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import type { GenerationCreateResponseDto, GenerateFlashcardsCommand } from "../../types";
 import { generateFlashcards } from "../../lib/services/generation.service";
-import { DEFAULT_USER_ID } from "../../db/supabase.client";
 
 // Disable prerendering for this API endpoint
 export const prerender = false;
@@ -30,14 +29,28 @@ const GenerateFlashcardsSchema = z.object({
  * - generated_count: number
  *
  * Error Responses:
+ * - 401: Unauthorized (user not authenticated)
  * - 400: Invalid input data
  * - 500: Server error (AI service failure or database error)
- *
- * Note: Authentication will be added later
  */
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const supabase = locals.supabase;
+    const user = locals.user;
+
+    // Check if user is authenticated
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "You must be logged in to generate flashcards",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
 
     // Get runtime context for environment variables (Cloudflare)
     const runtime = locals.runtime as { env?: { OPENROUTER_API_KEY?: string } } | undefined;
@@ -84,10 +97,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const command: GenerateFlashcardsCommand = validationResult.data;
 
     // Step 3: Call generation service to process the request
-    // TODO: Replace DEFAULT_USER_ID with actual authenticated user ID
     const result: GenerationCreateResponseDto = await generateFlashcards(
       command.source_text,
-      DEFAULT_USER_ID,
+      user.id,
       supabase,
       runtime // Pass runtime context for Cloudflare environment variables
     );
