@@ -81,7 +81,7 @@ export function useLearningSession(): UseLearningSessionReturn {
       }
 
       const data: LearningSessionResponseDto = await response.json();
-      
+
       // Set session even if empty - component will handle display
       setSession(data);
       setCurrentCardIndex(0);
@@ -154,7 +154,7 @@ export function useLearningSession(): UseLearningSessionReturn {
           throw new Error("Nie udało się zapisać oceny");
         }
 
-        const result: ReviewResponseDto = await response.json();
+        await response.json();
 
         // Move to next card
         setCurrentCardIndex((prev) => prev + 1);
@@ -202,8 +202,8 @@ export function useLearningSession(): UseLearningSessionReturn {
         throw new Error("Nie udało się zresetować postępów");
       }
 
-      const result: ResetLearningProgressResponseDto = await response.json();
-      
+      await response.json();
+
       // After successful reset, fetch new session with all cards
       await fetchSession();
     } catch (err) {
@@ -235,4 +235,3 @@ export function useLearningSession(): UseLearningSessionReturn {
     resetProgress,
   };
 }
-
