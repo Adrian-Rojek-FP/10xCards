@@ -82,13 +82,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
     const { page, limit, sort, order, source, generation_id } = validationResult.data;
 
     // Step 2: Call service to fetch flashcards
-    const result = await getFlashcards(
-      supabase,
-      user.id,
-      { source, generation_id },
-      { page, limit },
-      { sort, order }
-    );
+    const result = await getFlashcards(supabase, user.id, { source, generation_id }, { page, limit }, { sort, order });
 
     // Step 3: Return successful response
     return new Response(JSON.stringify(result), {
@@ -241,4 +235,3 @@ export const POST: APIRoute = async ({ request, locals }) => {
     );
   }
 };
-

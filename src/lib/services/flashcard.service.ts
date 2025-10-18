@@ -1,6 +1,12 @@
 // src/lib/services/flashcard.service.ts
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { FlashcardCreateDto, FlashcardDto, FlashcardsListResponseDto, FlashcardUpdateDto, Source } from "../../types";
+import type {
+  FlashcardCreateDto,
+  FlashcardDto,
+  FlashcardsListResponseDto,
+  FlashcardUpdateDto,
+  Source,
+} from "../../types";
 
 /**
  * Helper function to validate that a generation_id belongs to the specified user
@@ -16,14 +22,9 @@ async function validateGenerationOwnership(
   generationId: number,
   userId: string
 ): Promise<boolean> {
-  const { data, error } = await supabase
-    .from("generations")
-    .select("id, user_id")
-    .eq("id", generationId)
-    .single();
+  const { data, error } = await supabase.from("generations").select("id, user_id").eq("id", generationId).single();
 
   if (error) {
-    console.error("Error validating generation ownership:", error);
     throw new Error("Failed to validate generation ownership");
   }
 
@@ -73,7 +74,6 @@ export async function getFlashcards(
   const { data, error, count } = await query;
 
   if (error) {
-    console.error("Error fetching flashcards:", error);
     throw new Error("Failed to fetch flashcards");
   }
 
@@ -98,11 +98,7 @@ export async function getFlashcards(
  * @returns Promise<FlashcardDto> - The requested flashcard
  * @throws Error if flashcard not found or database operation fails
  */
-export async function getFlashcardById(
-  supabase: SupabaseClient,
-  id: number,
-  userId: string
-): Promise<FlashcardDto> {
+export async function getFlashcardById(supabase: SupabaseClient, id: number, userId: string): Promise<FlashcardDto> {
   const { data, error } = await supabase
     .from("flashcards")
     .select("id, front, back, source, generation_id, created_at, updated_at")
@@ -111,7 +107,6 @@ export async function getFlashcardById(
     .single();
 
   if (error || !data) {
-    console.error("Error fetching flashcard:", error);
     throw new Error("Flashcard not found");
   }
 
@@ -152,7 +147,6 @@ export async function createFlashcards(
       .in("id", uniqueGenerationIds);
 
     if (generationsError) {
-      console.error("Error validating generation_ids:", generationsError);
       throw new Error("Failed to validate generation_ids");
     }
 
@@ -187,7 +181,6 @@ export async function createFlashcards(
     .select();
 
   if (insertError || !createdFlashcards) {
-    console.error("Database insert error:", insertError);
     throw new Error("Failed to create flashcards in database");
   }
 
@@ -238,7 +231,6 @@ export async function updateFlashcard(
     .single();
 
   if (error || !data) {
-    console.error("Error updating flashcard:", error);
     throw new Error("Flashcard not found");
   }
 
@@ -255,11 +247,7 @@ export async function updateFlashcard(
  * @returns Promise<void>
  * @throws Error if flashcard not found or database operation fails
  */
-export async function deleteFlashcard(
-  supabase: SupabaseClient,
-  id: number,
-  userId: string
-): Promise<void> {
+export async function deleteFlashcard(supabase: SupabaseClient, id: number, userId: string): Promise<void> {
   const { error, count } = await supabase
     .from("flashcards")
     .delete({ count: "exact" })
@@ -267,7 +255,6 @@ export async function deleteFlashcard(
     .eq("user_id", userId);
 
   if (error) {
-    console.error("Error deleting flashcard:", error);
     throw new Error("Failed to delete flashcard");
   }
 

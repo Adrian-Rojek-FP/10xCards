@@ -68,8 +68,16 @@ export const flashcardsCreateSchema = z.object({
  */
 export const flashcardUpdateSchema = z
   .object({
-    front: z.string().min(1, "Front side cannot be empty").max(200, "Front side must not exceed 200 characters").optional(),
-    back: z.string().min(1, "Back side cannot be empty").max(500, "Back side must not exceed 500 characters").optional(),
+    front: z
+      .string()
+      .min(1, "Front side cannot be empty")
+      .max(200, "Front side must not exceed 200 characters")
+      .optional(),
+    back: z
+      .string()
+      .min(1, "Back side cannot be empty")
+      .max(500, "Back side must not exceed 500 characters")
+      .optional(),
     source: z.enum(["ai-full", "ai-edited", "manual"]).optional(),
     generation_id: z.number().nullable().optional(),
   })
@@ -115,4 +123,3 @@ export const flashcardsQuerySchema = z.object({
   source: z.enum(["ai-full", "ai-edited", "manual"]).optional(),
   generation_id: z.coerce.number().int().positive().optional(),
 });
-
