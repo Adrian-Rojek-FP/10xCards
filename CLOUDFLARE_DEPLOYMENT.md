@@ -143,11 +143,28 @@ export default defineConfig({
 
 - [ ] All environment variables are set in Cloudflare Pages
 - [ ] Both `PUBLIC_*` and non-`PUBLIC_*` Supabase variables are configured
+- [ ] Supabase redirect URLs configured (see below)
 - [ ] Build completes successfully
 - [ ] Homepage loads without errors
 - [ ] Login/Register functionality works
+- [ ] Password reset functionality works (see PASSWORD_RESET_CLOUDFLARE_CONFIG.md)
 - [ ] Flashcard creation works
 - [ ] API endpoints respond correctly
+
+### Configure Supabase Redirect URLs
+
+**⚠️ IMPORTANT:** After deploying to Cloudflare, you must configure Supabase to allow redirects from your deployment URL.
+
+1. Go to [Supabase Dashboard](https://app.supabase.com) → Your Project → **Authentication** → **URL Configuration**
+2. Set **Site URL** to: `https://your-app-name.pages.dev`
+3. Add to **Redirect URLs**:
+   - `https://your-app-name.pages.dev/update-password`
+   - `https://your-app-name.pages.dev/**`
+
+**Why this is needed:**
+- Password reset emails contain links that redirect to your app
+- Without proper configuration, reset links will fail with "access_denied" errors
+- See [PASSWORD_RESET_CLOUDFLARE_CONFIG.md](./PASSWORD_RESET_CLOUDFLARE_CONFIG.md) for detailed configuration guide
 
 ## 🔄 Continuous Deployment
 

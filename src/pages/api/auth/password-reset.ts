@@ -53,10 +53,8 @@ export const POST: APIRoute = async ({ request, cookies, locals }) => {
   // Always return success message for security (don't reveal if email exists)
   return new Response(
     JSON.stringify({
-      message:
-        "Jeśli podany adres e-mail jest zarejestrowany w systemie, otrzymasz instrukcje resetowania hasła.",
+      message: "Jeśli podany adres e-mail jest zarejestrowany w systemie, otrzymasz instrukcje resetowania hasła.",
     }),
     { status: 200 }
   );
 };
-

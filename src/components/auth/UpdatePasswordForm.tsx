@@ -42,7 +42,7 @@ export function UpdatePasswordForm() {
       }
 
       setSuccessMessage(data.message + " Za chwilę zostaniesz przekierowany...");
-      
+
       // Redirect to login after 2 seconds
       setTimeout(() => {
         window.location.href = "/login";
