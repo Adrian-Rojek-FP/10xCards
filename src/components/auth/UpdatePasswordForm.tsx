@@ -18,7 +18,7 @@ export function UpdatePasswordForm() {
   React.useEffect(() => {
     const supabase = getSupabaseBrowserClient();
 
-    // Debug: Check URL for tokens
+    // Debug: Check URL for tokens/code
     if (typeof window !== "undefined") {
       // eslint-disable-next-line no-console
       console.log("[Password Reset Debug] URL Hash:", window.location.hash);
@@ -44,9 +44,51 @@ export function UpdatePasswordForm() {
       }
     });
 
-    // Also check immediately in case session already exists
-    const checkSession = async () => {
-      // Give Supabase time to process URL hash and trigger auth state change
+    // Handle PKCE flow - check for code in URL and exchange it
+    const handlePKCEFlow = async () => {
+      // Check if we have a code parameter (PKCE flow)
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+
+      // eslint-disable-next-line no-console
+      console.log("[Password Reset Debug] PKCE code found:", !!code);
+
+      if (code) {
+        try {
+          // Exchange the code for a session
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+          // eslint-disable-next-line no-console
+          console.log("[Password Reset Debug] Code exchange result:", {
+            hasSession: !!data.session,
+            error: error?.message,
+          });
+
+          if (error) {
+            setError(
+              "Link resetowania hasła jest nieprawidłowy lub wygasł. Linki resetowania są ważne przez 1 godzinę i mogą być użyte tylko raz."
+            );
+            setHasValidSession(false);
+            setIsCheckingSession(false);
+            return;
+          }
+
+          if (data.session) {
+            setHasValidSession(true);
+            setIsCheckingSession(false);
+            return;
+          }
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error("[Password Reset Debug] Code exchange error:", err);
+          setError("Wystąpił błąd podczas weryfikacji linku resetowania.");
+          setHasValidSession(false);
+          setIsCheckingSession(false);
+          return;
+        }
+      }
+
+      // If no code, check for existing session (hash-based flow)
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const {
@@ -72,15 +114,12 @@ export function UpdatePasswordForm() {
       setIsCheckingSession(false);
     };
 
-    // Set a timeout to check session if auth state change doesn't fire
-    const timeoutId = setTimeout(() => {
-      checkSession();
-    }, 100);
+    // Start the PKCE flow handler
+    handlePKCEFlow();
 
     // Cleanup subscription on unmount
     return () => {
       subscription.unsubscribe();
-      clearTimeout(timeoutId);
     };
   }, []);
 
