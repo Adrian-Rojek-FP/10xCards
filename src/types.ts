@@ -144,3 +144,162 @@ export interface FlashcardViewModel {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// ------------------------------------------------------------------------------------------------
+// Learning System Types - Base Database Aliases
+// ------------------------------------------------------------------------------------------------
+export type LearningState = Database["public"]["Tables"]["learning_state"]["Row"];
+export type LearningStateInsert = Database["public"]["Tables"]["learning_state"]["Insert"];
+export type LearningStateUpdate = Database["public"]["Tables"]["learning_state"]["Update"];
+
+export type ReviewHistory = Database["public"]["Tables"]["review_history"]["Row"];
+export type ReviewHistoryInsert = Database["public"]["Tables"]["review_history"]["Insert"];
+
+// ------------------------------------------------------------------------------------------------
+// Learning System Enums
+// ------------------------------------------------------------------------------------------------
+export type FlashcardSource = Database["public"]["Enums"]["flashcard_source"];
+export type LearningStatus = Database["public"]["Enums"]["learning_status"];
+export type ReviewRating = Database["public"]["Enums"]["review_rating"];
+
+// Rating as integer (0-3) for API and calculations
+export type RatingValue = 0 | 1 | 2 | 3;
+
+// Mapping between rating names and values
+export const RATING_MAP = {
+  again: 0,
+  hard: 1,
+  good: 2,
+  easy: 3,
+} as const;
+
+// ------------------------------------------------------------------------------------------------
+// 13. Learning State DTO
+//     Represents learning state as returned by the API
+// ------------------------------------------------------------------------------------------------
+export type LearningStateDto = Pick<
+  LearningState,
+  "id" | "flashcard_id" | "status" | "easiness_factor" | "interval" | "repetitions" | "lapses" | "next_review_date"
+>;
+
+// ------------------------------------------------------------------------------------------------
+// 14. Flashcard with Learning State DTO
+//     Extended flashcard DTO that includes learning state (used in GET /learning/session)
+// ------------------------------------------------------------------------------------------------
+export interface FlashcardWithLearningStateDto extends FlashcardDto {
+  learning_state: LearningStateDto;
+}
+
+// ------------------------------------------------------------------------------------------------
+// 15. Learning Session Response DTO
+//     Response from GET /learning/session endpoint
+// ------------------------------------------------------------------------------------------------
+export interface LearningSessionResponseDto {
+  session_id: string; // Generated UUID for tracking
+  flashcards: FlashcardWithLearningStateDto[];
+  total_due: number;
+  new_cards: number;
+  review_cards: number;
+}
+
+// ------------------------------------------------------------------------------------------------
+// 16. Review Submit Command
+//     Request body for POST /learning/review endpoint
+// ------------------------------------------------------------------------------------------------
+export interface ReviewSubmitCommand {
+  flashcard_id: number;
+  rating: RatingValue;
+  review_duration_ms?: number;
+}
+
+// ------------------------------------------------------------------------------------------------
+// 17. Review Response DTO
+//     Response from POST /learning/review endpoint
+// ------------------------------------------------------------------------------------------------
+export interface ReviewResponseDto {
+  flashcard_id: number;
+  previous_state: {
+    status: LearningStatus;
+    easiness_factor: number;
+    interval: number;
+    repetitions: number;
+    next_review_date: string;
+  };
+  new_state: {
+    status: LearningStatus;
+    easiness_factor: number;
+    interval: number;
+    repetitions: number;
+    next_review_date: string;
+  };
+  review_recorded: boolean;
+}
+
+// ------------------------------------------------------------------------------------------------
+// 18. Learning Stats DTO
+//     Response from GET /learning/stats endpoint
+// ------------------------------------------------------------------------------------------------
+export interface LearningStatsDto {
+  total_flashcards: number;
+  by_status: {
+    new: number;
+    learning: number;
+    review: number;
+    relearning: number;
+  };
+  due_today: number;
+  overdue: number;
+  retention_rate: number; // 0.0 - 1.0
+  total_reviews: number;
+  reviews_today: number;
+  average_easiness_factor: number;
+  streak_days: number;
+}
+
+// ------------------------------------------------------------------------------------------------
+// 19. Review History DTO
+//     Represents a review history entry as returned by the API
+// ------------------------------------------------------------------------------------------------
+export type ReviewHistoryDto = Pick<
+  ReviewHistory,
+  | "id"
+  | "flashcard_id"
+  | "rating"
+  | "review_duration_ms"
+  | "previous_interval"
+  | "new_interval"
+  | "previous_easiness_factor"
+  | "new_easiness_factor"
+  | "reviewed_at"
+>;
+
+// ------------------------------------------------------------------------------------------------
+// 20. Review History List Response DTO
+//     Paginated list of review history entries (GET /learning/history)
+// ------------------------------------------------------------------------------------------------
+export interface ReviewHistoryListResponseDto {
+  data: ReviewHistoryDto[];
+  pagination: PaginationDto;
+}
+
+// ------------------------------------------------------------------------------------------------
+// 21. Learning Session Query Params
+//     Query parameters for GET /learning/session
+// ------------------------------------------------------------------------------------------------
+export interface LearningSessionQueryParams {
+  limit?: number;
+  status?: LearningStatus;
+  include_new?: boolean;
+}
+
+// ------------------------------------------------------------------------------------------------
+// 22. Review History Query Params
+//     Query parameters for GET /learning/history
+// ------------------------------------------------------------------------------------------------
+export interface ReviewHistoryQueryParams {
+  page?: number;
+  limit?: number;
+  flashcard_id?: number;
+  from_date?: string; // ISO 8601
+  to_date?: string; // ISO 8601
+}
