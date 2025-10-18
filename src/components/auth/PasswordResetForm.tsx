@@ -23,7 +23,6 @@ export function PasswordResetForm() {
 
     // TODO: Implement Supabase password reset
     // This will be implemented in the next phase
-    console.log("Password reset attempt:", { email });
 
     // Simulate API call
     setTimeout(() => {

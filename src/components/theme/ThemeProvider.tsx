@@ -23,8 +23,8 @@ export function ThemeProvider({
         if (storedTheme === "light" || storedTheme === "dark") {
           return storedTheme;
         }
-      } catch (error) {
-        console.warn("Nie można odczytać motywu z localStorage:", error);
+      } catch {
+        // Silently fail if localStorage is not available
       }
     }
     return defaultTheme;
@@ -42,8 +42,8 @@ export function ThemeProvider({
     // Zapisz motyw w localStorage
     try {
       localStorage.setItem(storageKey, theme);
-    } catch (error) {
-      console.warn("Nie można zapisać motywu w localStorage:", error);
+    } catch {
+      // Silently fail if localStorage is not available
     }
   }, [theme, storageKey]);
 

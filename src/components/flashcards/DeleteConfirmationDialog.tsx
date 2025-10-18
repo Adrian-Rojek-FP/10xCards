@@ -27,8 +27,6 @@ export function DeleteConfirmationDialog({ isOpen, onClose, onConfirm }: DeleteC
     setIsDeleting(true);
     try {
       await onConfirm();
-    } catch (error) {
-      console.error("Error during deletion:", error);
     } finally {
       setIsDeleting(false);
     }

@@ -28,7 +28,6 @@ export function UpdatePasswordForm() {
 
     // TODO: Implement Supabase password update
     // This will be implemented in the next phase
-    console.log("Password update attempt");
 
     // Simulate API call
     setTimeout(() => {

@@ -202,7 +202,6 @@ export async function submitReview(
   });
 
   if (insertError) {
-    console.error("Failed to insert review history:", insertError);
     throw new Error("Failed to record review history");
   }
 

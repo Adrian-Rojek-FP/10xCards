@@ -46,8 +46,7 @@ export function FlashcardsView() {
       }
       setIsFormModalOpen(false);
       setEditingFlashcard(null);
-    } catch (error) {
-      console.error("Error saving flashcard:", error);
+    } catch {
       // Error is already set in the hook
     }
   };
@@ -59,8 +58,7 @@ export function FlashcardsView() {
       await deleteFlashcard(deletingFlashcard.id);
       setIsDeleteDialogOpen(false);
       setDeletingFlashcard(null);
-    } catch (error) {
-      console.error("Error deleting flashcard:", error);
+    } catch {
       // Error is already set in the hook
     }
   };

@@ -91,7 +91,6 @@ export function useFlashcards(): UseFlashcardsResult {
       } catch (err) {
         const error = err instanceof Error ? err : new Error("Unknown error occurred");
         setError(error);
-        console.error("Error fetching flashcards:", error);
       } finally {
         setIsLoading(false);
       }
@@ -130,7 +129,6 @@ export function useFlashcards(): UseFlashcardsResult {
       } catch (err) {
         const error = err instanceof Error ? err : new Error("Unknown error occurred");
         setError(error);
-        console.error("Error creating flashcard:", error);
         throw error; // Re-throw to allow component to handle
       } finally {
         setIsLoading(false);
@@ -170,7 +168,6 @@ export function useFlashcards(): UseFlashcardsResult {
       } catch (err) {
         const error = err instanceof Error ? err : new Error("Unknown error occurred");
         setError(error);
-        console.error("Error updating flashcard:", error);
         throw error;
       } finally {
         setIsLoading(false);
@@ -206,7 +203,6 @@ export function useFlashcards(): UseFlashcardsResult {
       } catch (err) {
         const error = err instanceof Error ? err : new Error("Unknown error occurred");
         setError(error);
-        console.error("Error deleting flashcard:", error);
         throw error;
       } finally {
         setIsLoading(false);
@@ -252,7 +248,6 @@ export function useFlashcards(): UseFlashcardsResult {
       } catch (err) {
         const error = err instanceof Error ? err : new Error("Unknown error occurred");
         setError(error);
-        console.error("Error fetching flashcards:", error);
       } finally {
         setIsLoading(false);
       }

@@ -74,7 +74,6 @@ export async function getFlashcards(
   const { data, error, count } = await query;
 
   if (error) {
-    console.error("Supabase error in getFlashcards:", error);
     throw new Error(`Failed to fetch flashcards: ${error.message}`);
   }
 

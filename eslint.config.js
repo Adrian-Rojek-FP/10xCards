@@ -23,6 +23,14 @@ const baseConfig = tseslint.config({
   },
 });
 
+// Allow console in test files, API routes, and example files
+const consoleOverrides = tseslint.config({
+  files: ["**/*.test.ts", "**/*.spec.ts", "**/api/**/*.ts", "**/*.example.ts"],
+  rules: {
+    "no-console": "off",
+  },
+});
+
 const jsxA11yConfig = tseslint.config({
   files: ["**/*.{js,jsx,ts,tsx}"],
   extends: [jsxA11y.flatConfigs.recommended],
@@ -58,7 +66,11 @@ const reactConfig = tseslint.config({
 
 export default tseslint.config(
   includeIgnoreFile(gitignorePath),
+  {
+    ignores: ["src/db/database.types.ts"],
+  },
   baseConfig,
+  consoleOverrides,
   jsxA11yConfig,
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],
