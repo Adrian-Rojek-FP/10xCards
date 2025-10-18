@@ -1,0 +1,18 @@
+---
+// src/pages/session.astro
+import Layout from "@/layouts/Layout.astro";
+import LearningSession from "@/components/learning/LearningSession";
+
+// Check authentication
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+export const prerender = false;
+---
+
+<Layout title="Sesja nauki - 10xCards">
+  <LearningSession client:load />
+</Layout>
+

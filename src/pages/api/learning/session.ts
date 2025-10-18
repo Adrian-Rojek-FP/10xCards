@@ -17,15 +17,17 @@ export const prerender = false;
  *
  * Response (200):
  * - session_id: string (UUID)
- * - flashcards: FlashcardWithLearningStateDto[]
+ * - flashcards: FlashcardWithLearningStateDto[] (may be empty if no cards due)
  * - total_due: number
  * - new_cards: number
  * - review_cards: number
  *
+ * Note: Returns 200 even when no flashcards are due (flashcards array will be empty).
+ * Frontend should handle the empty state gracefully.
+ *
  * Error Responses:
  * - 400: Invalid query parameters
  * - 401: Unauthorized
- * - 404: No flashcards due for review
  * - 500: Server error
  */
 export const GET: APIRoute = async ({ url, locals }) => {
@@ -84,23 +86,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
       include_new,
     });
 
-    // Check if any flashcards are due
-    if (session.flashcards.length === 0) {
-      return new Response(
-        JSON.stringify({
-          error: "No flashcards due",
-          message: "No flashcards are currently due for review",
-          session_id: session.session_id,
-          total_due: session.total_due,
-        }),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    // Return successful response
+    // Always return 200 - frontend will handle empty flashcards gracefully
     return new Response(JSON.stringify(session), {
       status: 200,
       headers: { "Content-Type": "application/json" },

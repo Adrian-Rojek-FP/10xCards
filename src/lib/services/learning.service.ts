@@ -28,26 +28,15 @@ export async function getLearningSession(
 ): Promise<LearningSessionResponseDto> {
   const limit = params.limit || 20;
   const includeNew = params.include_new ?? true;
+  const now = new Date().toISOString();
 
   // Build query for learning_state with flashcards
+  // Note: We query flashcards separately and join manually to avoid RLS issues with nested queries
   let query = supabase
     .from("learning_state")
-    .select(
-      `
-      *,
-      flashcards:flashcard_id (
-        id,
-        front,
-        back,
-        source,
-        generation_id,
-        created_at,
-        updated_at
-      )
-    `
-    )
+    .select("*")
     .eq("user_id", userId)
-    .lte("next_review_date", new Date().toISOString());
+    .lte("next_review_date", now);
 
   // Apply status filter if provided
   if (params.status) {
@@ -65,11 +54,55 @@ export async function getLearningSession(
     .order("next_review_date", { ascending: true })
     .limit(limit);
 
-  const { data, error } = await query;
+  const { data: learningStates, error } = await query;
 
   if (error) {
     throw new Error(`Failed to fetch learning session: ${error.message}`);
   }
+
+  // If no learning states found, return early
+  if (!learningStates || learningStates.length === 0) {
+    // Still get counts for stats
+    const { count: totalDue } = await supabase
+      .from("learning_state")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .lte("next_review_date", new Date().toISOString());
+
+    const { count: newCards } = await supabase
+      .from("learning_state")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("status", "new")
+      .lte("next_review_date", new Date().toISOString());
+
+    return {
+      session_id: randomUUID(),
+      flashcards: [],
+      total_due: totalDue || 0,
+      new_cards: newCards || 0,
+      review_cards: (totalDue || 0) - (newCards || 0),
+    };
+  }
+
+  // Extract flashcard IDs from learning states
+  const flashcardIds = learningStates.map((ls) => ls.flashcard_id);
+
+  // Fetch flashcards separately
+  const { data: flashcardsData, error: flashcardsError } = await supabase
+    .from("flashcards")
+    .select("id, front, back, source, generation_id, created_at, updated_at")
+    .in("id", flashcardIds)
+    .eq("user_id", userId);
+
+  if (flashcardsError) {
+    throw new Error(`Failed to fetch flashcards: ${flashcardsError.message}`);
+  }
+
+  // Create a map for quick lookup
+  const flashcardsMap = new Map(
+    flashcardsData?.map((fc) => [fc.id, fc]) || []
+  );
 
   // Get total counts for stats
   const { count: totalDue } = await supabase
@@ -85,27 +118,33 @@ export async function getLearningSession(
     .eq("status", "new")
     .lte("next_review_date", new Date().toISOString());
 
-  // Transform data to DTO format
-  const flashcards: FlashcardWithLearningStateDto[] =
-    data?.map((item) => ({
-      id: item.flashcards.id,
-      front: item.flashcards.front,
-      back: item.flashcards.back,
-      source: item.flashcards.source,
-      generation_id: item.flashcards.generation_id,
-      created_at: item.flashcards.created_at,
-      updated_at: item.flashcards.updated_at,
-      learning_state: {
-        id: item.id,
-        flashcard_id: item.flashcard_id,
-        status: item.status,
-        easiness_factor: item.easiness_factor,
-        interval: item.interval,
-        repetitions: item.repetitions,
-        lapses: item.lapses,
-        next_review_date: item.next_review_date,
-      },
-    })) || [];
+  // Transform data to DTO format by joining learning states with flashcards
+  const flashcards: FlashcardWithLearningStateDto[] = learningStates
+    .map((item) => {
+      const flashcard = flashcardsMap.get(item.flashcard_id);
+      if (!flashcard) return null;
+
+      return {
+        id: flashcard.id,
+        front: flashcard.front,
+        back: flashcard.back,
+        source: flashcard.source,
+        generation_id: flashcard.generation_id,
+        created_at: flashcard.created_at,
+        updated_at: flashcard.updated_at,
+        learning_state: {
+          id: item.id,
+          flashcard_id: item.flashcard_id,
+          status: item.status,
+          easiness_factor: item.easiness_factor,
+          interval: item.interval,
+          repetitions: item.repetitions,
+          lapses: item.lapses,
+          next_review_date: item.next_review_date,
+        },
+      };
+    })
+    .filter((item): item is FlashcardWithLearningStateDto => item !== null);
 
   return {
     session_id: randomUUID(),

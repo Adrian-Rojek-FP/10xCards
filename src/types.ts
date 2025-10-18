@@ -288,7 +288,7 @@ export interface ReviewHistoryListResponseDto {
 // ------------------------------------------------------------------------------------------------
 export interface LearningSessionQueryParams {
   limit?: number;
-  status?: LearningStatus;
+  status?: LearningStatus | null;
   include_new?: boolean;
 }
 
