@@ -66,7 +66,7 @@ export function FlashcardFormModal({ isOpen, onClose, onSave, initialData }: Fla
         const updateData: FlashcardUpdateDto = {};
         if (front !== initialData.front) updateData.front = front.trim();
         if (back !== initialData.back) updateData.back = back.trim();
-        
+
         // Only call onSave if there are actual changes
         if (Object.keys(updateData).length > 0) {
           await onSave(updateData);
@@ -102,9 +102,7 @@ export function FlashcardFormModal({ isOpen, onClose, onSave, initialData }: Fla
         <DialogHeader>
           <DialogTitle>{isEditMode ? "Edytuj fiszkę" : "Dodaj nową fiszkę"}</DialogTitle>
           <DialogDescription>
-            {isEditMode
-              ? "Wprowadź zmiany w treści fiszki."
-              : "Wypełnij pola poniżej, aby utworzyć nową fiszkę."}
+            {isEditMode ? "Wprowadź zmiany w treści fiszki." : "Wypełnij pola poniżej, aby utworzyć nową fiszkę."}
           </DialogDescription>
         </DialogHeader>
 
@@ -148,10 +146,7 @@ export function FlashcardFormModal({ isOpen, onClose, onSave, initialData }: Fla
               value={back}
               onChange={(e) => setBack(e.target.value)}
               placeholder="Wpisz odpowiedź lub definicję..."
-              className={cn(
-                "min-h-[150px] resize-y",
-                backError && "border-destructive focus-visible:ring-destructive"
-              )}
+              className={cn("min-h-[150px] resize-y", backError && "border-destructive focus-visible:ring-destructive")}
               maxLength={500}
               disabled={isSubmitting}
               aria-invalid={!!backError}
@@ -187,4 +182,3 @@ export function FlashcardFormModal({ isOpen, onClose, onSave, initialData }: Fla
     </Dialog>
   );
 }
-

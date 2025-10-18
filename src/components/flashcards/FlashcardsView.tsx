@@ -1,5 +1,4 @@
 import * as React from "react";
-import type { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { useFlashcards } from "@/components/hooks/useFlashcards";
 import { FlashcardList } from "./FlashcardList";
@@ -8,25 +7,13 @@ import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import { PaginationControls } from "./PaginationControls";
 import type { FlashcardViewModel, FlashcardCreateDto, FlashcardUpdateDto } from "@/types";
 
-interface FlashcardsViewProps {
-  user: User | null;
-}
-
 /**
  * Main view component for "My Flashcards" page.
  * Manages state and coordinates interactions between child components.
  */
-export function FlashcardsView({ user }: FlashcardsViewProps) {
-  const {
-    flashcards,
-    pagination,
-    isLoading,
-    error,
-    createFlashcard,
-    updateFlashcard,
-    deleteFlashcard,
-    setPage,
-  } = useFlashcards();
+export function FlashcardsView() {
+  const { flashcards, pagination, isLoading, error, createFlashcard, updateFlashcard, deleteFlashcard, setPage } =
+    useFlashcards();
 
   // Modal state management
   const [isFormModalOpen, setIsFormModalOpen] = React.useState(false);
@@ -175,4 +162,3 @@ export function FlashcardsView({ user }: FlashcardsViewProps) {
     </div>
   );
 }
-

@@ -58,4 +58,3 @@ export function DeleteConfirmationDialog({ isOpen, onClose, onConfirm }: DeleteC
     </AlertDialog>
   );
 }
-

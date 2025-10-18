@@ -103,13 +103,7 @@ export function PaginationControls({ pagination, onPageChange }: PaginationContr
       </Button>
 
       {/* Previous page button */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handlePrevious}
-        disabled={page === 1}
-        aria-label="Poprzednia strona"
-      >
+      <Button variant="outline" size="sm" onClick={handlePrevious} disabled={page === 1} aria-label="Poprzednia strona">
         <svg
           className="h-4 w-4"
           fill="none"
@@ -147,7 +141,13 @@ export function PaginationControls({ pagination, onPageChange }: PaginationContr
       </div>
 
       {/* Next page button */}
-      <Button variant="outline" size="sm" onClick={handleNext} disabled={page === totalPages} aria-label="Następna strona">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleNext}
+        disabled={page === totalPages}
+        aria-label="Następna strona"
+      >
         <span className="mr-2 hidden sm:inline">Następna</span>
         <svg
           className="h-4 w-4"
@@ -184,4 +184,3 @@ export function PaginationControls({ pagination, onPageChange }: PaginationContr
     </nav>
   );
 }
-

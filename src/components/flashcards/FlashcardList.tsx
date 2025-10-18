@@ -17,7 +17,10 @@ export function FlashcardList({ flashcards, isLoading, onEdit, onDelete }: Flash
   if (isLoading) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+        <div
+          className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]"
+          role="status"
+        >
           <span className="sr-only">Ładowanie...</span>
         </div>
         <p className="mt-4 text-muted-foreground">Ładowanie fiszek...</p>
@@ -57,15 +60,9 @@ export function FlashcardList({ flashcards, isLoading, onEdit, onDelete }: Flash
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
         {flashcards.map((flashcard) => (
-          <FlashcardListItem
-            key={flashcard.id}
-            flashcard={flashcard}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
+          <FlashcardListItem key={flashcard.id} flashcard={flashcard} onEdit={onEdit} onDelete={onDelete} />
         ))}
       </div>
     </div>
   );
 }
-

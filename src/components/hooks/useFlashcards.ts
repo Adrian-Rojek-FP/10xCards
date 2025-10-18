@@ -83,7 +83,7 @@ export function useFlashcards(): UseFlashcardsResult {
         const data: FlashcardsListResponseDto = await response.json();
         setFlashcards(data.data.map(mapDtoToViewModel));
         setPagination(data.pagination);
-        
+
         // Update query params if they were changed
         if (params) {
           setQueryParams(currentParams);
@@ -224,9 +224,42 @@ export function useFlashcards(): UseFlashcardsResult {
 
   // Fetch flashcards on mount and when query params change
   useEffect(() => {
-    fetchFlashcards();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryParams.page, queryParams.limit]);
+    const loadFlashcards = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const searchParams = new URLSearchParams({
+          page: queryParams.page.toString(),
+          limit: queryParams.limit.toString(),
+        });
+
+        const response = await fetch(`/api/flashcards?${searchParams}`);
+
+        if (response.status === 401) {
+          // Redirect to login if unauthorized
+          window.location.href = "/login";
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch flashcards: ${response.statusText}`);
+        }
+
+        const data: FlashcardsListResponseDto = await response.json();
+        setFlashcards(data.data.map(mapDtoToViewModel));
+        setPagination(data.pagination);
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error("Unknown error occurred");
+        setError(error);
+        console.error("Error fetching flashcards:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadFlashcards();
+  }, [queryParams.page, queryParams.limit, mapDtoToViewModel]);
 
   return {
     flashcards,
@@ -240,4 +273,3 @@ export function useFlashcards(): UseFlashcardsResult {
     setPage,
   };
 }
-
