@@ -1,6 +1,122 @@
 // src/lib/services/flashcard.service.ts
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { FlashcardCreateDto, FlashcardDto } from "../../types";
+import type { FlashcardCreateDto, FlashcardDto, FlashcardsListResponseDto, FlashcardUpdateDto, Source } from "../../types";
+
+/**
+ * Helper function to validate that a generation_id belongs to the specified user
+ *
+ * @param supabase - Supabase client instance
+ * @param generationId - The generation ID to validate
+ * @param userId - The user ID to check ownership against
+ * @returns Promise<boolean> - true if generation belongs to user, false otherwise
+ * @throws Error if database query fails
+ */
+async function validateGenerationOwnership(
+  supabase: SupabaseClient,
+  generationId: number,
+  userId: string
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("generations")
+    .select("id, user_id")
+    .eq("id", generationId)
+    .single();
+
+  if (error) {
+    console.error("Error validating generation ownership:", error);
+    throw new Error("Failed to validate generation ownership");
+  }
+
+  return data !== null && data.user_id === userId;
+}
+
+/**
+ * Retrieves a paginated, filtered, and sorted list of flashcards for the authenticated user
+ *
+ * @param supabase - Supabase client instance
+ * @param userId - The authenticated user's ID
+ * @param filters - Optional filters (source, generation_id)
+ * @param pagination - Pagination params (page, limit)
+ * @param sorting - Sorting params (sort field, order)
+ * @returns Promise<FlashcardsListResponseDto> - Paginated list with metadata
+ * @throws Error if database operation fails
+ */
+export async function getFlashcards(
+  supabase: SupabaseClient,
+  userId: string,
+  filters: { source?: Source; generation_id?: number },
+  pagination: { page: number; limit: number },
+  sorting: { sort: string; order: "asc" | "desc" }
+): Promise<FlashcardsListResponseDto> {
+  // Build base query
+  let query = supabase
+    .from("flashcards")
+    .select("id, front, back, source, generation_id, created_at, updated_at", { count: "exact" })
+    .eq("user_id", userId);
+
+  // Apply filters
+  if (filters.source) {
+    query = query.eq("source", filters.source);
+  }
+  if (filters.generation_id !== undefined) {
+    query = query.eq("generation_id", filters.generation_id);
+  }
+
+  // Apply sorting
+  query = query.order(sorting.sort, { ascending: sorting.order === "asc" });
+
+  // Apply pagination
+  const offset = (pagination.page - 1) * pagination.limit;
+  query = query.range(offset, offset + pagination.limit - 1);
+
+  // Execute query
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error("Error fetching flashcards:", error);
+    throw new Error("Failed to fetch flashcards");
+  }
+
+  // Return paginated response
+  return {
+    data: data || [],
+    pagination: {
+      page: pagination.page,
+      limit: pagination.limit,
+      total: count || 0,
+    },
+  };
+}
+
+/**
+ * Retrieves a single flashcard by ID
+ * RLS ensures that only the owner can access their flashcard
+ *
+ * @param supabase - Supabase client instance
+ * @param id - The flashcard ID
+ * @param userId - The authenticated user's ID (used for RLS)
+ * @returns Promise<FlashcardDto> - The requested flashcard
+ * @throws Error if flashcard not found or database operation fails
+ */
+export async function getFlashcardById(
+  supabase: SupabaseClient,
+  id: number,
+  userId: string
+): Promise<FlashcardDto> {
+  const { data, error } = await supabase
+    .from("flashcards")
+    .select("id, front, back, source, generation_id, created_at, updated_at")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !data) {
+    console.error("Error fetching flashcard:", error);
+    throw new Error("Flashcard not found");
+  }
+
+  return data;
+}
 
 /**
  * Creates multiple flashcards in a single batch operation
@@ -85,4 +201,78 @@ export async function createFlashcards(
     created_at: fc.created_at,
     updated_at: fc.updated_at,
   }));
+}
+
+/**
+ * Updates an existing flashcard
+ * RLS ensures that only the owner can update their flashcard
+ *
+ * @param supabase - Supabase client instance
+ * @param id - The flashcard ID to update
+ * @param updates - Partial flashcard data to update
+ * @param userId - The authenticated user's ID
+ * @returns Promise<FlashcardDto> - The updated flashcard
+ * @throws Error if flashcard not found, validation fails, or database operation fails
+ */
+export async function updateFlashcard(
+  supabase: SupabaseClient,
+  id: number,
+  updates: FlashcardUpdateDto,
+  userId: string
+): Promise<FlashcardDto> {
+  // Step 1: Validate generation_id ownership if provided
+  if (updates.generation_id !== undefined && updates.generation_id !== null) {
+    const isValid = await validateGenerationOwnership(supabase, updates.generation_id, userId);
+    if (!isValid) {
+      throw new Error("Generation not found or access denied");
+    }
+  }
+
+  // Step 2: Perform update (RLS ensures user_id match)
+  const { data, error } = await supabase
+    .from("flashcards")
+    .update(updates)
+    .eq("id", id)
+    .eq("user_id", userId)
+    .select("id, front, back, source, generation_id, created_at, updated_at")
+    .single();
+
+  if (error || !data) {
+    console.error("Error updating flashcard:", error);
+    throw new Error("Flashcard not found");
+  }
+
+  return data;
+}
+
+/**
+ * Deletes a flashcard by ID
+ * RLS ensures that only the owner can delete their flashcard
+ *
+ * @param supabase - Supabase client instance
+ * @param id - The flashcard ID to delete
+ * @param userId - The authenticated user's ID
+ * @returns Promise<void>
+ * @throws Error if flashcard not found or database operation fails
+ */
+export async function deleteFlashcard(
+  supabase: SupabaseClient,
+  id: number,
+  userId: string
+): Promise<void> {
+  const { error, count } = await supabase
+    .from("flashcards")
+    .delete({ count: "exact" })
+    .eq("id", id)
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("Error deleting flashcard:", error);
+    throw new Error("Failed to delete flashcard");
+  }
+
+  // Check if any row was deleted
+  if (count === 0) {
+    throw new Error("Flashcard not found");
+  }
 }

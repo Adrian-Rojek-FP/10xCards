@@ -1,67 +1,117 @@
-// src/pages/api/flashcards.ts
+// src/pages/api/flashcards/index.ts
 import type { APIRoute } from "astro";
-import { z } from "zod";
-import type { FlashcardsCreateCommand, FlashcardDto } from "../../types";
-import { createFlashcards } from "../../lib/services/flashcard.service";
+import type { FlashcardsCreateCommand, FlashcardDto } from "../../../types";
+import { createFlashcards, getFlashcards } from "../../../lib/services/flashcard.service";
+import { flashcardsCreateSchema, flashcardsQuerySchema } from "../../../lib/validation/flashcard.validation";
 
 // Disable prerendering for this API endpoint
 export const prerender = false;
 
 /**
- * Zod schema for validating a single flashcard creation request
+ * GET /api/flashcards
  *
- * Validation rules:
- * - front: maximum 200 characters
- * - back: maximum 500 characters
- * - source: must be one of "ai-full", "ai-edited", or "manual"
- * - generation_id: required (not null) for "ai-full" and "ai-edited", must be null for "manual"
+ * Retrieves a paginated, filtered, and sorted list of flashcards for the authenticated user
+ *
+ * Query Parameters:
+ * - page: number (default: 1) - Page number for pagination
+ * - limit: number (default: 10, max: 100) - Number of items per page
+ * - sort: string (default: "created_at") - Field to sort by (created_at, updated_at, front, back)
+ * - order: string (default: "desc") - Sort order (asc, desc)
+ * - source: string (optional) - Filter by source type (ai-full, ai-edited, manual)
+ * - generation_id: number (optional) - Filter by generation ID
+ *
+ * Response (200):
+ * - data: FlashcardDto[] (array of flashcards)
+ * - pagination: { page, limit, total }
+ *
+ * Error Responses:
+ * - 400: Invalid query parameters
+ * - 401: Unauthorized (user not authenticated)
+ * - 500: Server error
  */
-const FlashcardCreateSchema = z
-  .object({
-    front: z.string().min(1, "Front side cannot be empty").max(200, "Front side must not exceed 200 characters"),
-    back: z.string().min(1, "Back side cannot be empty").max(500, "Back side must not exceed 500 characters"),
-    source: z.enum(["ai-full", "ai-edited", "manual"], {
-      errorMap: () => ({ message: "Source must be one of: ai-full, ai-edited, manual" }),
-    }),
-    generation_id: z.number().nullable(),
-  })
-  .refine(
-    (data) => {
-      // For "ai-full" and "ai-edited", generation_id must be a number (not null)
-      if (data.source === "ai-full" || data.source === "ai-edited") {
-        return data.generation_id !== null;
-      }
-      return true;
-    },
-    {
-      message: "generation_id is required for source types 'ai-full' and 'ai-edited'",
-      path: ["generation_id"],
-    }
-  )
-  .refine(
-    (data) => {
-      // For "manual", generation_id must be null
-      if (data.source === "manual") {
-        return data.generation_id === null;
-      }
-      return true;
-    },
-    {
-      message: "generation_id must be null for source type 'manual'",
-      path: ["generation_id"],
-    }
-  );
+export const GET: APIRoute = async ({ url, locals }) => {
+  try {
+    const supabase = locals.supabase;
+    const user = locals.user;
 
-/**
- * Zod schema for validating the complete request body
- * Expects an array of flashcards
- */
-const FlashcardsCreateCommandSchema = z.object({
-  flashcards: z
-    .array(FlashcardCreateSchema)
-    .min(1, "At least one flashcard is required")
-    .max(100, "Cannot create more than 100 flashcards at once"),
-});
+    // Check if user is authenticated
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "You must be logged in to view flashcards",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Step 1: Extract and validate query parameters
+    const queryParams = {
+      page: url.searchParams.get("page"),
+      limit: url.searchParams.get("limit"),
+      sort: url.searchParams.get("sort"),
+      order: url.searchParams.get("order"),
+      source: url.searchParams.get("source"),
+      generation_id: url.searchParams.get("generation_id"),
+    };
+
+    const validationResult = flashcardsQuerySchema.safeParse(queryParams);
+
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+      }));
+
+      return new Response(
+        JSON.stringify({
+          error: "Validation failed",
+          message: "Invalid query parameters",
+          details: errors,
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const { page, limit, sort, order, source, generation_id } = validationResult.data;
+
+    // Step 2: Call service to fetch flashcards
+    const result = await getFlashcards(
+      supabase,
+      user.id,
+      { source, generation_id },
+      { page, limit },
+      { sort, order }
+    );
+
+    // Step 3: Return successful response
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error in GET /api/flashcards:", error);
+
+    const errorMessage = error instanceof Error ? error.message : "An error occurred while fetching flashcards";
+
+    return new Response(
+      JSON.stringify({
+        error: "Internal server error",
+        message: errorMessage,
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+};
 
 /**
  * POST /api/flashcards
@@ -121,7 +171,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Step 2: Validate input data using Zod schema
-    const validationResult = FlashcardsCreateCommandSchema.safeParse(body);
+    const validationResult = flashcardsCreateSchema.safeParse(body);
 
     if (!validationResult.success) {
       const errors = validationResult.error.errors.map((err) => ({
@@ -191,3 +241,4 @@ export const POST: APIRoute = async ({ request, locals }) => {
     );
   }
 };
+

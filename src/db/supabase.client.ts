@@ -61,7 +61,7 @@ export function getSupabaseBrowserClient() {
 
 // --- SHARED TYPES ---
 
-export type SupabaseClient = typeof supabaseBrowserClient;
+export type SupabaseClient = SupabaseClientType<Database>;
 
 // This is likely a remnant of old code and should be removed if not used.
 // For now, it's kept to avoid breaking changes.
