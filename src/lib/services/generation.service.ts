@@ -58,6 +58,7 @@ Guidelines:
 - Generate 5-10 flashcards depending on content length and complexity
 - Avoid yes/no questions; prefer "what", "how", "why" questions
 - Each flashcard should be self-contained and test one specific piece of knowledge
+- Flashcards should be in language of the provided text
 
 Return your response as a JSON object with a "flashcards" array containing objects with "front" and "back" properties.`;
 
